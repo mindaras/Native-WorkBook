@@ -115,30 +115,44 @@ export default class Add extends Component {
             autoFocus={true}
             autoCapitalize="words"
             style={styles.input}
-            placeholder="Telefonas"
+            placeholder="Vardas"
           />
           <TextInput
             onChangeText={this.onChange.bind(this, "phone")}
             value={phone}
             keyboardType="numbers-and-punctuation"
             style={styles.input}
-            placeholder="Vardas"
+            placeholder="Telefonas"
           />
-          <TextInput
-            onFocus={this.onFocusToggle.bind(this, "service")}
-            onBlur={this.onFocusToggle.bind(this, "service")}
-            value={service}
-            autoCapitalize="sentences"
-            style={styles.input}
-            placeholder="Paslauga"
-          />
-          <TextInput
-            onFocus={this.onFocusToggle.bind(this, "date")}
-            onBlur={this.onFocusToggle.bind(this, "date")}
-            value={`${date.toLocaleDateString("lt-LT")} - ${time}`}
-            style={styles.input}
-            placeholder="Data"
-          />
+          <View style={{ position: "relative" }}>
+            <TextInput
+              value={service}
+              autoCapitalize="sentences"
+              style={styles.input}
+              placeholder="Paslauga"
+              editable={false}
+            />
+            <View style={styles.inputButton}>
+              <Button
+                title={serviceFocused ? "Uždaryti" : "Keisti"}
+                onPress={this.onFocusToggle.bind(this, "service")}
+              />
+            </View>
+          </View>
+          <View style={{ position: "relative" }}>
+            <TextInput
+              value={`${date.toLocaleDateString("lt-LT")} - ${time}`}
+              style={styles.input}
+              placeholder="Data"
+              editable={false}
+            />
+            <View style={styles.inputButton}>
+              <Button
+                title={dateFocused ? "Uždaryti" : "Keisti"}
+                onPress={this.onFocusToggle.bind(this, "date")}
+              />
+            </View>
+          </View>
           {serviceFocused && (
             <PickerIOS
               selectedValue={service}
@@ -149,8 +163,8 @@ export default class Add extends Component {
                 label="Ilgalaikis nagų lakavimas"
                 value="Ilgalaikis nagų lakavimas"
               />
-              <PickerIOS.Item label="Manikiuras" value="Manikiuras" />
-              <PickerIOS.Item label="Pedikiuras" value="Pedikiuras" />
+              <PickerIOS.Item label="Manikiūras" value="Manikiūras" />
+              <PickerIOS.Item label="Pedikiūras" value="Pedikiūras" />
             </PickerIOS>
           )}
           {dateFocused && (
@@ -181,5 +195,10 @@ const styles = StyleSheet.create({
     borderColor: "rgba(255, 255, 255, 0.2)",
     marginBottom: 10,
     borderRadius: 4
+  },
+  inputButton: {
+    position: "absolute",
+    top: -4,
+    right: 20
   }
 });

@@ -222,17 +222,18 @@ export default class Intro extends Component {
               alignItems: "center"
             }}
           >
-            <Button title="Atgal" onPress={this.changeDay} />
-            <Text
-              style={{ textAlign: "center", fontWeight: "bold" }}
-              onPress={this.toggleCalendar}
-            >
+            <View style={{ width: "25%", alignItems: "flex-start" }}>
+              <Button title="Atgal" onPress={this.changeDay} />
+            </View>
+            <Text style={{ fontWeight: "bold" }} onPress={this.toggleCalendar}>
               {localDate}
             </Text>
-            <Button
-              title="Sekanti"
-              onPress={this.changeDay.bind(this, "next")}
-            />
+            <View style={{ width: "25%", alignItems: "flex-end" }}>
+              <Button
+                title="Sekanti"
+                onPress={this.changeDay.bind(this, "next")}
+              />
+            </View>
           </View>
           {this.renderClients()}
           <Button title="Pridėti" onPress={this.onAdd} />
