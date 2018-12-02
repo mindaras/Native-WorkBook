@@ -83,7 +83,8 @@ export default class Add extends Component {
 
       this.props.navigator.push({
         component: Intro,
-        title: "Klientai"
+        title: "Klientai",
+        passProps: { date }
       });
     } catch (error) {}
   };
@@ -119,6 +120,7 @@ export default class Add extends Component {
           <TextInput
             onChangeText={this.onChange.bind(this, "phone")}
             value={phone}
+            keyboardType="numbers-and-punctuation"
             style={styles.input}
             placeholder="Vardas"
           />

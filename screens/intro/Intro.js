@@ -10,17 +10,68 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo";
 import { AsyncStorage } from "react-native";
+import { Calendar, LocaleConfig } from "react-native-calendars";
 import { Detail } from "../detail";
 import { Add } from "../add";
-import { createSecureServer } from "http2";
+import { timingSafeEqual } from "crypto";
+
+LocaleConfig.locales["lt"] = {
+  monthNames: [
+    "Sausis",
+    "Vasaris",
+    "Kovas",
+    "Balandis",
+    "Gegužė",
+    "Birželis",
+    "Liepa",
+    "Rugpjūtis",
+    "Rugsėjis",
+    "Spalis",
+    "Lapkritis",
+    "Gruodis"
+  ],
+  monthNamesShort: [
+    "Saus.",
+    "Vas.",
+    "Kov.",
+    "Bal.",
+    "Geg.",
+    "Birž",
+    "Liep.",
+    "Rugp.",
+    "Rugs.",
+    "Spal.",
+    "Lap.",
+    "Gruod."
+  ],
+  dayNames: [
+    "Pirmadienis",
+    "Antradienis",
+    "Trečiadienis",
+    "Ketvirtadienis",
+    "Penktadienis",
+    "Šeštadienis",
+    "Sekmadienis"
+  ],
+  dayNamesShort: ["Pir.", "Ant.", "Tre.", "Ket.", "Pen.", "Šeš.", "Sek."]
+};
+
+LocaleConfig.defaultLocale = "lt";
 
 export default class Intro extends Component {
   state = {
-    date: new Date(),
-    clients: []
+    date: this.props.date,
+    clients: [],
+    showCalendar: false
   };
 
-  componentDidMount = async () => {
+  static defaultProps = { date: new Date() };
+
+  componentDidMount = () => {
+    this.retrieveClients();
+  };
+
+  retrieveClients = async () => {
     const clients = this.filterAndSortClients((await this.getClients()) || {});
 
     this.setState({ clients });
@@ -134,9 +185,31 @@ export default class Intro extends Component {
     );
   };
 
-  nextDay = () => {};
+  updateDate = timestamp => {
+    this.setState({ date: new Date(timestamp) }, this.retrieveClients);
+  };
+
+  changeDay = direction => {
+    const { date } = this.state;
+    const newDate =
+      direction === "next" ? date.getDate() + 1 : date.getDate() - 1;
+
+    this.updateDate(date.setDate(newDate));
+  };
+
+  toggleCalendar = () => {
+    this.setState(prevState => ({ showCalendar: !prevState.showCalendar }));
+  };
+
+  onDayPress = ({ timestamp }) => {
+    this.updateDate(timestamp);
+    this.toggleCalendar();
+  };
 
   render() {
+    const { date } = this.state;
+    const localDate = date.toLocaleDateString("lt-LT");
+
     return (
       <View>
         <LinearGradient
@@ -150,14 +223,31 @@ export default class Intro extends Component {
               alignItems: "center"
             }}
           >
-            <Button title="Prev" onPress={() => {}} />
-            <Text style={{ textAlign: "center", fontWeight: "bold" }}>
-              {new Date(this.state.date).toLocaleDateString("lt-LT")}
+            <Button title="Prev" onPress={this.changeDay} />
+            <Text
+              style={{ textAlign: "center", fontWeight: "bold" }}
+              onPress={this.toggleCalendar}
+            >
+              {localDate}
             </Text>
-            <Button title="Next" onPress={this.nextDay} />
+            <Button title="Next" onPress={this.changeDay.bind(this, "next")} />
           </View>
           {this.renderClients()}
           <Button title="Add" onPress={this.onAdd} />
+          {this.state.showCalendar && (
+            <View style={styles.calendar}>
+              <Calendar
+                onDayPress={this.onDayPress}
+                markedDates={{
+                  [localDate]: {
+                    selected: true,
+                    selectedColor: "blue"
+                  }
+                }}
+              />
+              <Button title="Close" onPress={this.toggleCalendar} />
+            </View>
+          )}
         </LinearGradient>
       </View>
     );
@@ -187,5 +277,15 @@ const styles = StyleSheet.create({
   },
   textMargin: {
     marginBottom: 2
+  },
+  calendar: {
+    position: "absolute",
+    top: 88,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: "space-between",
+    paddingBottom: 20,
+    backgroundColor: "#fff"
   }
 });

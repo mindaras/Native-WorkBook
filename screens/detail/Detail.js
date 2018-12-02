@@ -17,7 +17,7 @@ export default class Detail extends Component {
   constructor(props) {
     super(props);
 
-    const { name, phone, service, date, time } = props;
+    const { name, phone, service, date, time, confirmed } = props;
 
     this.state = {
       name,
@@ -25,6 +25,7 @@ export default class Detail extends Component {
       service,
       date,
       time,
+      confirmed,
       serviceFocused: false,
       dateFocused: false,
       modalVisible: false
@@ -34,7 +35,8 @@ export default class Detail extends Component {
   redirectToRoot = () => {
     this.props.navigator.push({
       component: Intro,
-      title: "Klientai"
+      title: "Klientai",
+      passProps: { date: this.state.date }
     });
   };
 
@@ -92,7 +94,7 @@ export default class Detail extends Component {
   };
 
   onSubmit = async () => {
-    const { date, time, phone, name, service } = this.state;
+    const { date, time, phone, name, service, confirmed } = this.state;
     const clients = JSON.parse(await this.getClients()) || {};
 
     delete clients[this.props.time];
@@ -102,12 +104,14 @@ export default class Detail extends Component {
         date.toLocaleDateString("lt-LT"),
         JSON.stringify({
           ...clients,
-          [time]: { key: time, time, phone, name, service, confirmed: false }
+          [time]: { key: time, time, phone, name, service, confirmed }
         })
       );
 
       this.redirectToRoot();
-    } catch (error) {}
+    } catch (e) {
+      console.log("error", e);
+    }
   };
 
   removeClient = async () => {
@@ -128,7 +132,7 @@ export default class Detail extends Component {
   };
 
   toggleModal = () => {
-    this.setState({ modalVisible: !this.state.modalVisible });
+    this.setState(prevState => ({ modalVisible: !prevState.modalVisible }));
   };
 
   sendReminder = () => {
@@ -172,6 +176,7 @@ export default class Detail extends Component {
             <TextInput
               onChangeText={this.onChange.bind(this, "phone")}
               value={phone}
+              keyboardType="numbers-and-punctuation"
               style={styles.input}
               placeholder="Vardas"
             />
@@ -228,7 +233,7 @@ export default class Detail extends Component {
           >
             <View style={styles.modal}>
               <Text style={styles.modalTitle}>
-                Ar tikrai norite pašaliti {name}?
+                Ar tikrai norite pašalinti {name}?
               </Text>
               <View style={styles.modalButtons}>
                 <View style={{ marginRight: 20 }}>
