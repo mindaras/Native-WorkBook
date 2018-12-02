@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "AwesomeProject",
-    "slug": "AwesomeProject",
+    "name": "WorkBook",
+    "slug": "workbook",
     "privacy": "public",
     "sdkVersion": "31.0.0",
     "platforms": [
@@ -23,7 +23,13 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
-    }
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mindaugaslazauskas.workbook"
+    },
+    "android": {
+      "package": "com.mindaugaslazauskas.workbook"
+    },
+    "description": "WorkBook application for iOS created with React Native.",
+    "githubUrl": "https://github.com/mindaras/Native-WorkBook"
   }
 }
