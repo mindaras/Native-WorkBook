@@ -13,7 +13,6 @@ import { AsyncStorage } from "react-native";
 import { Calendar, LocaleConfig } from "react-native-calendars";
 import { Detail } from "../detail";
 import { Add } from "../add";
-import { timingSafeEqual } from "crypto";
 
 LocaleConfig.locales["lt"] = {
   monthNames: [
@@ -223,17 +222,20 @@ export default class Intro extends Component {
               alignItems: "center"
             }}
           >
-            <Button title="Prev" onPress={this.changeDay} />
+            <Button title="Atgal" onPress={this.changeDay} />
             <Text
               style={{ textAlign: "center", fontWeight: "bold" }}
               onPress={this.toggleCalendar}
             >
               {localDate}
             </Text>
-            <Button title="Next" onPress={this.changeDay.bind(this, "next")} />
+            <Button
+              title="Sekanti"
+              onPress={this.changeDay.bind(this, "next")}
+            />
           </View>
           {this.renderClients()}
-          <Button title="Add" onPress={this.onAdd} />
+          <Button title="Pridėti" onPress={this.onAdd} />
           {this.state.showCalendar && (
             <View style={styles.calendar}>
               <Calendar
@@ -245,7 +247,7 @@ export default class Intro extends Component {
                   }
                 }}
               />
-              <Button title="Close" onPress={this.toggleCalendar} />
+              <Button title="Uždaryti" onPress={this.toggleCalendar} />
             </View>
           )}
         </LinearGradient>

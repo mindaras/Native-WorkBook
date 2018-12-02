@@ -164,7 +164,7 @@ export default class Detail extends Component {
         >
           <View>
             <View style={{ alignItems: "flex-end" }}>
-              <Button title="Update" onPress={this.onSubmit} />
+              <Button title="Atnaujinti" onPress={this.onSubmit} />
             </View>
             <TextInput
               onChangeText={this.onChange.bind(this, "name")}
@@ -197,7 +197,7 @@ export default class Detail extends Component {
             />
             <View style={{ marginTop: 10 }}>
               <Button
-                title="Send a reminder"
+                title="Siųsti priminimą"
                 onPress={this.sendReminder}
                 color="yellow"
               />
@@ -238,20 +238,20 @@ export default class Detail extends Component {
               <View style={styles.modalButtons}>
                 <View style={{ marginRight: 20 }}>
                   <Button
-                    title="Cancel"
+                    title="Atšaukti"
                     onPress={this.toggleModal}
                     color="red"
                   />
                 </View>
                 <Button
-                  title="Confirm"
+                  title="Patvirtinti"
                   onPress={this.removeClient}
                   color="green"
                 />
               </View>
             </View>
           </Modal>
-          <Button title="Remove" onPress={this.toggleModal} color="red" />
+          <Button title="Pašalinti" onPress={this.toggleModal} color="red" />
         </LinearGradient>
       </View>
     );

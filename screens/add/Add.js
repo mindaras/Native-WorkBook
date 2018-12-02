@@ -107,7 +107,7 @@ export default class Add extends Component {
           style={styles.container}
         >
           <View style={{ alignItems: "flex-end" }}>
-            <Button title="Save" onPress={this.onSubmit} />
+            <Button title="Išsaugoti" onPress={this.onSubmit} />
           </View>
           <TextInput
             onChangeText={this.onChange.bind(this, "name")}
