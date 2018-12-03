@@ -32,14 +32,6 @@ export default class Detail extends Component {
     };
   }
 
-  redirectToRoot = () => {
-    this.props.navigator.push({
-      component: Intro,
-      title: "Klientai",
-      passProps: { date: this.state.date }
-    });
-  };
-
   onChange = (key, value) => {
     this.setState({ [key]: value });
   };
@@ -108,7 +100,11 @@ export default class Detail extends Component {
         })
       );
 
-      this.redirectToRoot();
+      this.props.navigator.push({
+        component: Intro,
+        title: "Klientai",
+        passProps: { date: this.state.date }
+      });
     } catch (e) {
       console.log("error", e);
     }
@@ -127,7 +123,11 @@ export default class Detail extends Component {
 
       this.toggleModal();
 
-      this.redirectToRoot();
+      this.props.navigator.resetTo({
+        component: Intro,
+        title: "Klientai",
+        passProps: { date: this.state.date, reset: true }
+      });
     } catch (e) {}
   };
 

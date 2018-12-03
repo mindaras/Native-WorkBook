@@ -44,15 +44,15 @@ LocaleConfig.locales["lt"] = {
     "Gruod."
   ],
   dayNames: [
+    "Sekmadienis",
     "Pirmadienis",
     "Antradienis",
     "Trečiadienis",
     "Ketvirtadienis",
     "Penktadienis",
-    "Šeštadienis",
-    "Sekmadienis"
+    "Šeštadienis"
   ],
-  dayNamesShort: ["Pir.", "Ant.", "Tre.", "Ket.", "Pen.", "Šeš.", "Sek."]
+  dayNamesShort: ["Sek.", "Pir.", "Ant.", "Tre.", "Ket.", "Pen.", "Šeš."]
 };
 
 LocaleConfig.defaultLocale = "lt";
@@ -61,13 +61,21 @@ export default class Intro extends Component {
   state = {
     date: this.props.date,
     clients: [],
-    showCalendar: false
+    showCalendar: false,
+    reset: false
   };
 
   static defaultProps = { date: new Date() };
 
   componentDidMount = () => {
     this.retrieveClients();
+  };
+
+  componentDidUpdate = ({ reset }) => {
+    if (reset && reset !== this.state.reset) {
+      this.retrieveClients();
+      this.setState({ reset: true });
+    }
   };
 
   retrieveClients = async () => {
@@ -155,6 +163,7 @@ export default class Intro extends Component {
 
     return (
       <FlatList
+        style={{ borderColor: "red" }}
         data={clients}
         renderItem={({ item }) => {
           const { name, time, service, confirmed } = item;
@@ -235,8 +244,10 @@ export default class Intro extends Component {
               />
             </View>
           </View>
-          {this.renderClients()}
-          <Button title="Pridėti" onPress={this.onAdd} />
+          <View style={{ height: "88%" }}>{this.renderClients()}</View>
+          <View style={{ marginTop: 5 }}>
+            <Button title="Pridėti" onPress={this.onAdd} />
+          </View>
           {this.state.showCalendar && (
             <View style={styles.calendar}>
               <Calendar
