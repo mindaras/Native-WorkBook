@@ -163,14 +163,15 @@ export default class Intro extends Component {
 
     return (
       <FlatList
-        style={{ borderColor: "red" }}
         data={clients}
-        renderItem={({ item }) => {
+        renderItem={({ item, index }) => {
           const { name, time, service, confirmed } = item;
+          const marginTop = index === 0 ? 20 : 0;
+          const marginBottom = index === clients.length - 1 ? 40 : 5;
 
           return (
             <TouchableOpacity onPress={this.onClientPress.bind(this, item)}>
-              <View style={styles.listItem}>
+              <View style={{ ...styles.listItem, marginTop, marginBottom }}>
                 <View>
                   <Text style={{ fontWeight: "bold", marginBottom: 4 }}>
                     {time}
@@ -221,16 +222,10 @@ export default class Intro extends Component {
     return (
       <View>
         <LinearGradient
-          colors={["#4CA1AF", "#C4E0E5"]}
+          colors={["#ddd6f3", "#faaca8"]}
           style={styles.container}
         >
-          <View
-            style={{
-              justifyContent: "space-between",
-              flexDirection: "row",
-              alignItems: "center"
-            }}
-          >
+          <View style={styles.top}>
             <View style={{ width: "25%", alignItems: "flex-start" }}>
               <Button title="Atgal" onPress={this.changeDay} />
             </View>
@@ -244,8 +239,16 @@ export default class Intro extends Component {
               />
             </View>
           </View>
-          <View style={{ height: "88%" }}>{this.renderClients()}</View>
-          <View style={{ marginTop: 5 }}>
+          <View
+            style={{
+              height: "85%",
+              paddingLeft: 10,
+              paddingRight: 10
+            }}
+          >
+            {this.renderClients()}
+          </View>
+          <View style={styles.bottom}>
             <Button title="Pridėti" onPress={this.onAdd} />
           </View>
           {this.state.showCalendar && (
@@ -270,11 +273,17 @@ export default class Intro extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 100,
-    paddingLeft: 10,
-    paddingRight: 10,
-    paddingBottom: 20,
-    minHeight: "100%"
+    height: "95%"
+  },
+  top: {
+    justifyContent: "space-between",
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    padding: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.2
   },
   listItem: {
     padding: 20,
@@ -282,7 +291,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: "#f4f4f4",
-    marginBottom: 5,
     borderRadius: 4,
     opacity: 0.8,
     shadowColor: "#000",
@@ -294,12 +302,25 @@ const styles = StyleSheet.create({
   },
   calendar: {
     position: "absolute",
-    top: 88,
+    top: 0,
     left: 0,
     right: 0,
     bottom: 0,
     justifyContent: "space-between",
+    paddingTop: 10,
     paddingBottom: 20,
     backgroundColor: "#fff"
+  },
+  bottom: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingTop: 10,
+    paddingBottom: 10,
+    backgroundColor: "#fff",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.2
   }
 });

@@ -15,19 +15,29 @@ export default class Add extends Component {
     dateFocused: false
   };
 
+  inputs = [];
+
   onChange = (key, value) => {
     this.setState({ [key]: value });
   };
 
-  onFocusToggle = key => {
+  togglePicker = key => {
     const { serviceFocused, dateFocused } = this.state;
+
+    this.inputs.forEach(input => input && input.blur());
 
     switch (key) {
       case "service":
-        this.setState(() => ({ serviceFocused: !serviceFocused }));
+        this.setState(() => ({
+          serviceFocused: !serviceFocused,
+          dateFocused: false
+        }));
         break;
       case "date":
-        this.setState(() => ({ dateFocused: !dateFocused }));
+        this.setState(() => ({
+          dateFocused: !dateFocused,
+          serviceFocused: false
+        }));
         break;
       default:
         return;
@@ -68,6 +78,14 @@ export default class Add extends Component {
     } catch (e) {}
   };
 
+  onFocus = () => {
+    const { serviceFocused, dateFocused } = this.state;
+
+    if (serviceFocused) this.setState({ serviceFocused: false });
+
+    if (dateFocused) this.setState({ dateFocused: false });
+  };
+
   onSubmit = async () => {
     const { date, time, phone, name, service } = this.state;
     const clients = JSON.parse(await this.getClients()) || {};
@@ -103,7 +121,7 @@ export default class Add extends Component {
     return (
       <View>
         <LinearGradient
-          colors={["#4CA1AF", "#C4E0E5"]}
+          colors={["#ddd6f3", "#faaca8"]}
           style={styles.container}
         >
           <View style={{ alignItems: "flex-end" }}>
@@ -111,18 +129,22 @@ export default class Add extends Component {
           </View>
           <TextInput
             onChangeText={this.onChange.bind(this, "name")}
+            onFocus={this.onFocus}
             value={name}
             autoFocus={true}
             autoCapitalize="words"
             style={styles.input}
             placeholder="Vardas"
+            ref={component => (this.inputs = [...this.inputs, component])}
           />
           <TextInput
             onChangeText={this.onChange.bind(this, "phone")}
+            onFocus={this.onFocus}
             value={phone}
             keyboardType="numbers-and-punctuation"
             style={styles.input}
             placeholder="Telefonas"
+            ref={component => (this.inputs = [...this.inputs, component])}
           />
           <View style={{ position: "relative" }}>
             <TextInput
@@ -135,7 +157,7 @@ export default class Add extends Component {
             <View style={styles.inputButton}>
               <Button
                 title={serviceFocused ? "Uždaryti" : "Keisti"}
-                onPress={this.onFocusToggle.bind(this, "service")}
+                onPress={this.togglePicker.bind(this, "service")}
               />
             </View>
           </View>
@@ -149,7 +171,7 @@ export default class Add extends Component {
             <View style={styles.inputButton}>
               <Button
                 title={dateFocused ? "Uždaryti" : "Keisti"}
-                onPress={this.onFocusToggle.bind(this, "date")}
+                onPress={this.togglePicker.bind(this, "date")}
               />
             </View>
           </View>
@@ -184,7 +206,7 @@ export default class Add extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 100,
+    paddingTop: 20,
     paddingLeft: 10,
     paddingRight: 10,
     height: "100%"
