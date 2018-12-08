@@ -175,13 +175,11 @@ export default class Detail extends Component {
         title: "Klientai",
         passProps: { date: this.state.date }
       });
-    } catch (e) {
-      console.log("error", e);
-    }
+    } catch (e) {}
   };
 
   removeClient = async () => {
-    const { time } = this.props;
+    const { date, time } = this.props;
     const clients = JSON.parse(await this.getClients()) || {};
 
     delete clients[time];
@@ -197,7 +195,10 @@ export default class Detail extends Component {
       this.props.navigator.resetTo({
         component: Intro,
         title: "Klientai",
-        passProps: { date: this.state.date, removed: time }
+        passProps: {
+          date: this.state.date,
+          removed: `${date.toLocaleDateString("lt-LT")}-${time}`
+        }
       });
     } catch (e) {}
   };

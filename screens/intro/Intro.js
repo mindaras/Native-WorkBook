@@ -79,18 +79,9 @@ export default class Intro extends Component {
   };
 
   retrieveClients = async () => {
-    const clients = this.filterAndSortClients((await this.getClients()) || {});
+    const clients = this.sortClients((await this.getClients()) || {});
+
     this.setState({ clients });
-  };
-
-  filterClients = clients => {
-    const filteredClients = { ...clients };
-
-    Object.keys(filteredClients).forEach(key => {
-      if (key[0] === "_") delete filteredClients[key];
-    });
-
-    return filteredClients;
   };
 
   sortClients = clients => {
@@ -104,12 +95,6 @@ export default class Intro extends Component {
     });
 
     return sortedClients;
-  };
-
-  filterAndSortClients = clients => {
-    const filteredClients = this.filterClients(clients);
-
-    return this.sortClients(filteredClients);
   };
 
   getClients = async () => {
@@ -147,7 +132,7 @@ export default class Intro extends Component {
         JSON.stringify(updatedClients)
       );
 
-      this.setState({ clients: this.filterAndSortClients(updatedClients) });
+      this.setState({ clients: this.sortClients(updatedClients) });
     } catch (e) {}
   };
 
@@ -231,9 +216,9 @@ export default class Intro extends Component {
             <View style={{ width: "25%", alignItems: "flex-start" }}>
               <Button title="Atgal" onPress={this.changeDay} />
             </View>
-            <Text style={{ fontWeight: "bold" }} onPress={this.toggleCalendar}>
-              {localDate}
-            </Text>
+            <TouchableOpacity style={styles.date} onPress={this.toggleCalendar}>
+              <Text style={{ fontWeight: "bold" }}>{localDate}</Text>
+            </TouchableOpacity>
             <View style={{ width: "25%", alignItems: "flex-end" }}>
               <Button
                 title="Sekanti"
@@ -286,6 +271,11 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.2
+  },
+  date: {
+    height: "100%",
+    flexDirection: "row",
+    alignItems: "center"
   },
   listItem: {
     padding: 20,
