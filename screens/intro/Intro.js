@@ -13,6 +13,7 @@ import { AsyncStorage } from "react-native";
 import { Calendar, LocaleConfig } from "react-native-calendars";
 import { Detail } from "../detail";
 import { Add } from "../add";
+import { storageKey } from "../common";
 
 LocaleConfig.locales["lt"] = {
   monthNames: [
@@ -71,16 +72,14 @@ export default class Intro extends Component {
     this.retrieveClients();
   };
 
-  componentDidUpdate = ({ reset }) => {
-    if (reset && reset !== this.state.reset) {
+  componentWillReceiveProps = nextProps => {
+    if (this.props.removed !== nextProps.removed) {
       this.retrieveClients();
-      this.setState({ reset: true });
     }
   };
 
   retrieveClients = async () => {
     const clients = this.filterAndSortClients((await this.getClients()) || {});
-
     this.setState({ clients });
   };
 
@@ -116,7 +115,9 @@ export default class Intro extends Component {
   getClients = async () => {
     try {
       const clients = JSON.parse(
-        await AsyncStorage.getItem(this.state.date.toLocaleDateString("lt-LT"))
+        await AsyncStorage.getItem(
+          `${storageKey}-${this.state.date.toLocaleDateString("lt-LT")}`
+        )
       );
 
       if (clients !== null) {
@@ -142,7 +143,7 @@ export default class Intro extends Component {
 
     try {
       await AsyncStorage.setItem(
-        this.state.date.toLocaleDateString("lt-LT"),
+        `${storageKey}-${this.state.date.toLocaleDateString("lt-LT")}`,
         JSON.stringify(updatedClients)
       );
 
@@ -165,7 +166,7 @@ export default class Intro extends Component {
       <FlatList
         data={clients}
         renderItem={({ item, index }) => {
-          const { name, time, service, confirmed } = item;
+          const { time, name, duration, service, confirmed } = item;
           const marginTop = index === 0 ? 20 : 0;
           const marginBottom = index === clients.length - 1 ? 40 : 5;
 
@@ -177,6 +178,7 @@ export default class Intro extends Component {
                     {time}
                   </Text>
                   <Text style={styles.textMargin}>{name}</Text>
+                  <Text style={styles.textMargin}>Trukmė: {duration}</Text>
                   <Text style={styles.textMargin}>{service}</Text>
                 </View>
                 <View>
@@ -222,7 +224,7 @@ export default class Intro extends Component {
     return (
       <View>
         <LinearGradient
-          colors={["#ddd6f3", "#faaca8"]}
+          colors={["#22c1c3", "#fdbb2d"]}
           style={styles.container}
         >
           <View style={styles.top}>
@@ -317,7 +319,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     paddingTop: 10,
-    paddingBottom: 10,
+    paddingBottom: 20,
     backgroundColor: "#fff",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 0 },

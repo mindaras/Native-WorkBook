@@ -3,6 +3,7 @@ import { View, StyleSheet, TextInput, PickerIOS, Button } from "react-native";
 import { LinearGradient } from "expo";
 import { AsyncStorage } from "react-native";
 import { Intro } from "../intro";
+import { storageKey } from "../common";
 
 export default class Add extends Component {
   state = {
@@ -10,8 +11,11 @@ export default class Add extends Component {
     phone: "+3706",
     service: "Ilgalaikis nagų lakavimas",
     date: this.props.date,
-    time: "08:00",
+    duration: "01:00",
+    hours: "08",
+    minutes: "00",
     serviceFocused: false,
+    durationFocused: false,
     dateFocused: false
   };
 
@@ -22,7 +26,7 @@ export default class Add extends Component {
   };
 
   togglePicker = key => {
-    const { serviceFocused, dateFocused } = this.state;
+    const { serviceFocused, durationFocused, dateFocused } = this.state;
 
     this.inputs.forEach(input => input && input.blur());
 
@@ -30,13 +34,22 @@ export default class Add extends Component {
       case "service":
         this.setState(() => ({
           serviceFocused: !serviceFocused,
+          durationFocused: false,
+          dateFocused: false
+        }));
+        break;
+      case "duration":
+        this.setState(() => ({
+          durationFocused: !durationFocused,
+          serviceFocused: false,
           dateFocused: false
         }));
         break;
       case "date":
         this.setState(() => ({
           dateFocused: !dateFocused,
-          serviceFocused: false
+          serviceFocused: false,
+          durationFocused: false
         }));
         break;
       default:
@@ -44,58 +57,104 @@ export default class Add extends Component {
     }
   };
 
-  renderTimeItems = () => {
-    const values = [];
-    let i = 0;
-
-    while (i < 24) {
-      let j = 0;
-
-      while (j <= 55) {
-        const hour = i.toString().length < 2 ? `0${i}` : i;
-        const second = j.toString().length < 2 ? `0${j}` : j;
-
-        values.push(`${hour}:${second}`);
-
-        j += 5;
-      }
-
-      i++;
-    }
-
+  renderPickerItems = values => {
     return values.map(value => (
       <PickerIOS.Item key={value} label={value} value={value} />
     ));
   };
 
+  renderDurations = () => {
+    return this.renderPickerItems([
+      "01:00",
+      "01:30",
+      "02:00",
+      "02:30",
+      "03:00"
+    ]);
+  };
+
+  renderHours = () => {
+    return this.renderPickerItems([
+      "08",
+      "09",
+      "10",
+      "11",
+      "12",
+      "13",
+      "14",
+      "15",
+      "16",
+      "17",
+      "18",
+      "19",
+      "20",
+      "21",
+      "22"
+    ]);
+  };
+
+  renderMinutes = () => {
+    return this.renderPickerItems([
+      "00",
+      "05",
+      "10",
+      "15",
+      "20",
+      "25",
+      "30",
+      "35",
+      "40",
+      "45",
+      "50",
+      "55"
+    ]);
+  };
+
   getClients = async () => {
     try {
       const clients = await AsyncStorage.getItem(
-        this.state.date.toLocaleDateString("lt-LT")
+        `${storageKey}-${this.state.date.toLocaleDateString("lt-LT")}`
       );
 
       return clients;
     } catch (e) {}
   };
 
+  getTime = () => {
+    const { hours, minutes } = this.state;
+
+    return `${hours}:${minutes}`;
+  };
+
   onFocus = () => {
-    const { serviceFocused, dateFocused } = this.state;
+    const { serviceFocused, durationFocused, dateFocused } = this.state;
 
     if (serviceFocused) this.setState({ serviceFocused: false });
+
+    if (durationFocused) this.setState({ durationFocused: false });
 
     if (dateFocused) this.setState({ dateFocused: false });
   };
 
   onSubmit = async () => {
-    const { date, time, phone, name, service } = this.state;
+    const { date, phone, name, duration, service } = this.state;
+    const time = this.getTime();
     const clients = JSON.parse(await this.getClients()) || {};
 
     try {
       await AsyncStorage.setItem(
-        date.toLocaleDateString("lt-LT"),
+        `${storageKey}-${date.toLocaleDateString("lt-LT")}`,
         JSON.stringify({
           ...clients,
-          [time]: { key: time, time, phone, name, service, confirmed: false }
+          [time]: {
+            key: time,
+            time,
+            phone,
+            name,
+            duration,
+            service,
+            confirmed: false
+          }
         })
       );
 
@@ -104,24 +163,28 @@ export default class Add extends Component {
         title: "Klientai",
         passProps: { date }
       });
-    } catch (error) {}
+    } catch (e) {}
   };
 
   render() {
     const {
       name,
       phone,
+      duration,
+      hours,
+      minutes,
       service,
       date,
-      time,
       serviceFocused,
+      durationFocused,
       dateFocused
     } = this.state;
+    const time = this.getTime();
 
     return (
       <View>
         <LinearGradient
-          colors={["#ddd6f3", "#faaca8"]}
+          colors={["#22c1c3", "#fdbb2d"]}
           style={styles.container}
         >
           <View style={{ alignItems: "flex-end" }}>
@@ -163,6 +226,20 @@ export default class Add extends Component {
           </View>
           <View style={{ position: "relative" }}>
             <TextInput
+              value={`Trukmė ${duration}`}
+              style={styles.input}
+              placeholder="Trukmė"
+              editable={false}
+            />
+            <View style={styles.inputButton}>
+              <Button
+                title={durationFocused ? "Uždaryti" : "Keisti"}
+                onPress={this.togglePicker.bind(this, "duration")}
+              />
+            </View>
+          </View>
+          <View style={{ position: "relative" }}>
+            <TextInput
               value={`${date.toLocaleDateString("lt-LT")} - ${time}`}
               style={styles.input}
               placeholder="Data"
@@ -189,14 +266,37 @@ export default class Add extends Component {
               <PickerIOS.Item label="Pedikiūras" value="Pedikiūras" />
             </PickerIOS>
           )}
-          {dateFocused && (
+          {durationFocused && (
             <PickerIOS
-              selectedValue={time}
-              onValueChange={this.onChange.bind(this, "time")}
+              selectedValue={duration}
+              onValueChange={this.onChange.bind(this, "duration")}
               style={{ width: "100%" }}
             >
-              {this.renderTimeItems()}
+              {this.renderDurations()}
             </PickerIOS>
+          )}
+          {dateFocused && (
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center"
+              }}
+            >
+              <PickerIOS
+                selectedValue={hours}
+                onValueChange={this.onChange.bind(this, "hours")}
+                style={{ width: "50%" }}
+              >
+                {this.renderHours()}
+              </PickerIOS>
+              <PickerIOS
+                selectedValue={minutes}
+                onValueChange={this.onChange.bind(this, "minutes")}
+                style={{ width: "50%" }}
+              >
+                {this.renderMinutes()}
+              </PickerIOS>
+            </View>
           )}
         </LinearGradient>
       </View>
