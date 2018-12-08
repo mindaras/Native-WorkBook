@@ -6,10 +6,12 @@ import {
   FlatList,
   TouchableOpacity,
   Button,
-  Switch
+  Switch,
+  Image
 } from "react-native";
 import { LinearGradient } from "expo";
 import { AsyncStorage } from "react-native";
+import { prevArrow, nextArrow } from "../../assets";
 import { Calendar, LocaleConfig } from "react-native-calendars";
 import { Detail } from "../detail";
 import { Add } from "../add";
@@ -73,9 +75,9 @@ export default class Intro extends Component {
   };
 
   componentWillReceiveProps = nextProps => {
-    if (this.props.removed !== nextProps.removed) {
-      this.retrieveClients();
-    }
+    const { changed } = this.props;
+
+    if (changed !== nextProps.added) this.retrieveClients();
   };
 
   retrieveClients = async () => {
@@ -214,16 +216,25 @@ export default class Intro extends Component {
         >
           <View style={styles.top}>
             <View style={{ width: "25%", alignItems: "flex-start" }}>
-              <Button title="Atgal" onPress={this.changeDay} />
+              <TouchableOpacity onPress={this.changeDay}>
+                <Image
+                  source={prevArrow}
+                  resizeMode="contain"
+                  style={styles.arrow}
+                />
+              </TouchableOpacity>
             </View>
             <TouchableOpacity style={styles.date} onPress={this.toggleCalendar}>
               <Text style={{ fontWeight: "bold" }}>{localDate}</Text>
             </TouchableOpacity>
             <View style={{ width: "25%", alignItems: "flex-end" }}>
-              <Button
-                title="Sekanti"
-                onPress={this.changeDay.bind(this, "next")}
-              />
+              <TouchableOpacity onPress={this.changeDay.bind(this, "next")}>
+                <Image
+                  source={nextArrow}
+                  resizeMode="contain"
+                  style={styles.arrow}
+                />
+              </TouchableOpacity>
             </View>
           </View>
           <View
@@ -267,7 +278,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#fff",
-    padding: 10,
+    paddingTop: 15,
+    paddingBottom: 15,
+    paddingLeft: 10,
+    paddingRight: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.2
@@ -276,6 +290,9 @@ const styles = StyleSheet.create({
     height: "100%",
     flexDirection: "row",
     alignItems: "center"
+  },
+  arrow: {
+    height: 20
   },
   listItem: {
     padding: 20,

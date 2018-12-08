@@ -9,7 +9,7 @@ export default class Add extends Component {
   state = {
     name: "",
     phone: "+3706",
-    service: "Ilgalaikis nagų lakavimas",
+    service: "Korekcija",
     date: this.props.date,
     duration: "01:00",
     hours: "08",
@@ -61,6 +61,16 @@ export default class Add extends Component {
     return values.map(value => (
       <PickerIOS.Item key={value} label={value} value={value} />
     ));
+  };
+
+  renderServices = () => {
+    return this.renderPickerItems([
+      "Korekcija",
+      "Ilgalaikis lakavimas",
+      "Nagų priauginimas",
+      "Pedikiūras",
+      "Kojų ilgalaikis lakavimas"
+    ]);
   };
 
   renderDurations = () => {
@@ -158,10 +168,13 @@ export default class Add extends Component {
         })
       );
 
-      this.props.navigator.push({
+      this.props.navigator.resetTo({
         component: Intro,
         title: "Klientai",
-        passProps: { date }
+        passProps: {
+          date,
+          changed: `${date.toLocaleDateString("lt-LT")}-${time}`
+        }
       });
     } catch (e) {}
   };
@@ -258,12 +271,7 @@ export default class Add extends Component {
               onValueChange={this.onChange.bind(this, "service")}
               style={{ width: "100%" }}
             >
-              <PickerIOS.Item
-                label="Ilgalaikis nagų lakavimas"
-                value="Ilgalaikis nagų lakavimas"
-              />
-              <PickerIOS.Item label="Manikiūras" value="Manikiūras" />
-              <PickerIOS.Item label="Pedikiūras" value="Pedikiūras" />
+              {this.renderServices()}
             </PickerIOS>
           )}
           {durationFocused && (

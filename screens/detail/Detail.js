@@ -7,7 +7,8 @@ import {
   AsyncStorage,
   Button,
   Modal,
-  Text
+  Text,
+  TouchableOpacity
 } from "react-native";
 import { LinearGradient } from "expo";
 import Communications from "react-native-communications";
@@ -79,6 +80,16 @@ export default class Detail extends Component {
     return values.map(value => (
       <PickerIOS.Item key={value} label={value} value={value} />
     ));
+  };
+
+  renderServices = () => {
+    return this.renderPickerItems([
+      "Korekcija",
+      "Ilgalaikis lakavimas",
+      "Nagų priauginimas",
+      "Pedikiūras",
+      "Kojų ilgalaikis lakavimas"
+    ]);
   };
 
   renderDurations = () => {
@@ -197,7 +208,7 @@ export default class Detail extends Component {
         title: "Klientai",
         passProps: {
           date: this.state.date,
-          removed: `${date.toLocaleDateString("lt-LT")}-${time}`
+          changed: `${date.toLocaleDateString("lt-LT")}-${time}`
         }
       });
     } catch (e) {}
@@ -304,25 +315,19 @@ export default class Detail extends Component {
                 />
               </View>
             </View>
-            <View style={{ marginTop: 10 }}>
-              <Button
-                title="Siųsti priminimą"
-                onPress={this.sendReminder}
-                color="yellow"
-              />
-            </View>
+            <TouchableOpacity
+              onPress={this.sendReminder}
+              style={styles.reminderButton}
+            >
+              <Text style={{ color: "#fff" }}>Siųsti priminimą</Text>
+            </TouchableOpacity>
             {serviceFocused && (
               <PickerIOS
                 selectedValue={service}
                 onValueChange={this.onChange.bind(this, "service")}
                 style={{ width: "100%" }}
               >
-                <PickerIOS.Item
-                  label="Ilgalaikis nagų lakavimas"
-                  value="Ilgalaikis nagų lakavimas"
-                />
-                <PickerIOS.Item label="Manikiūras" value="Manikiūras" />
-                <PickerIOS.Item label="Pedikiūras" value="Pedikiūras" />
+                {this.renderServices()}
               </PickerIOS>
             )}
             {durationFocused && (
@@ -410,6 +415,19 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: -4,
     right: 20
+  },
+  reminderButton: {
+    marginTop: 20,
+    backgroundColor: "#4286f4",
+    alignSelf: "center",
+    paddingTop: 12,
+    paddingBottom: 12,
+    paddingLeft: 25,
+    paddingRight: 25,
+    borderRadius: 30,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.2
   },
   modal: {
     height: "100%",
