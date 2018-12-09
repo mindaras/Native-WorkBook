@@ -8,7 +8,7 @@ import {
   Button,
   Modal,
   Text,
-  TouchableOpacity
+  TouchableHighlight
 } from "react-native";
 import { LinearGradient } from "expo";
 import Communications from "react-native-communications";
@@ -221,7 +221,6 @@ export default class Detail extends Component {
   sendReminder = () => {
     const { phone, date } = this.state;
     const time = this.getTime();
-
     Communications.text(
       phone,
       `Message related to an appointment at ${date} ${time}`
@@ -315,12 +314,13 @@ export default class Detail extends Component {
                 />
               </View>
             </View>
-            <TouchableOpacity
+            <TouchableHighlight
               onPress={this.sendReminder}
               style={styles.reminderButton}
+              underlayColor="#2f63b7"
             >
               <Text style={{ color: "#fff" }}>Siųsti priminimą</Text>
-            </TouchableOpacity>
+            </TouchableHighlight>
             {serviceFocused && (
               <PickerIOS
                 selectedValue={service}

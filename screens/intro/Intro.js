@@ -5,6 +5,7 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
+  TouchableHighlight,
   Button,
   Switch,
   Image
@@ -15,7 +16,7 @@ import { prevArrow, nextArrow } from "../../assets";
 import { Calendar, LocaleConfig } from "react-native-calendars";
 import { Detail } from "../detail";
 import { Add } from "../add";
-import { storageKey } from "../common";
+import { storageKey, markedDatesKey } from "../common";
 
 LocaleConfig.locales["lt"] = {
   monthNames: [
@@ -64,7 +65,9 @@ export default class Intro extends Component {
   state = {
     date: this.props.date,
     clients: [],
-    showCalendar: false,
+    markedDates: {},
+    showWorkCalendar: false,
+    showHolidayCalendar: false,
     reset: false
   };
 
@@ -72,6 +75,7 @@ export default class Intro extends Component {
 
   componentDidMount = () => {
     this.retrieveClients();
+    this.retrieveMarkedDates();
   };
 
   componentWillReceiveProps = nextProps => {
@@ -195,17 +199,64 @@ export default class Intro extends Component {
     this.updateDate(date.setDate(newDate));
   };
 
-  toggleCalendar = () => {
-    this.setState(prevState => ({ showCalendar: !prevState.showCalendar }));
+  toggleCalendar = calendar => {
+    this.setState(prevState => ({ [calendar]: !prevState[calendar] }));
+  };
+
+  switchToHolidayCalendar = () => {
+    this.setState({ showWorkCalendar: false, showHolidayCalendar: true });
   };
 
   onDayPress = ({ timestamp }) => {
     this.updateDate(timestamp);
-    this.toggleCalendar();
+    this.toggleCalendar("showWorkCalendar");
+  };
+
+  onHolidayPress = async ({ timestamp }) => {
+    const { date, markedDates } = this.state;
+    const localDate = new Date(timestamp).toLocaleDateString("lt-LT");
+    const isMarked = markedDates[localDate];
+    const updatedMarkedDates = { ...markedDates };
+
+    if (isMarked) {
+      delete updatedMarkedDates[localDate];
+    } else {
+      updatedMarkedDates[localDate] = {
+        marked: true,
+        dotColor: "red",
+        selectedColor: "blue"
+      };
+    }
+
+    try {
+      await AsyncStorage.setItem(
+        `${storageKey}-${markedDatesKey}`,
+        JSON.stringify(updatedMarkedDates)
+      );
+
+      this.setState({ markedDates: updatedMarkedDates });
+    } catch (e) {}
+  };
+
+  retrieveMarkedDates = async () => {
+    try {
+      const markedDates = JSON.parse(
+        await AsyncStorage.getItem(`${storageKey}-${markedDatesKey}`)
+      );
+
+      if (markedDates !== null) {
+        this.setState({ markedDates });
+      }
+    } catch (e) {}
   };
 
   render() {
-    const { date } = this.state;
+    const {
+      date,
+      markedDates,
+      showWorkCalendar,
+      showHolidayCalendar
+    } = this.state;
     const localDate = date.toLocaleDateString("lt-LT");
 
     return (
@@ -216,7 +267,10 @@ export default class Intro extends Component {
         >
           <View style={styles.top}>
             <View style={{ width: "25%", alignItems: "flex-start" }}>
-              <TouchableOpacity onPress={this.changeDay}>
+              <TouchableOpacity
+                onPress={this.changeDay}
+                style={styles.arrowContainer}
+              >
                 <Image
                   source={prevArrow}
                   resizeMode="contain"
@@ -224,11 +278,17 @@ export default class Intro extends Component {
                 />
               </TouchableOpacity>
             </View>
-            <TouchableOpacity style={styles.date} onPress={this.toggleCalendar}>
+            <TouchableOpacity
+              style={styles.date}
+              onPress={this.toggleCalendar.bind(this, "showWorkCalendar")}
+            >
               <Text style={{ fontWeight: "bold" }}>{localDate}</Text>
             </TouchableOpacity>
             <View style={{ width: "25%", alignItems: "flex-end" }}>
-              <TouchableOpacity onPress={this.changeDay.bind(this, "next")}>
+              <TouchableOpacity
+                onPress={this.changeDay.bind(this, "next")}
+                style={styles.arrowContainer}
+              >
                 <Image
                   source={nextArrow}
                   resizeMode="contain"
@@ -249,18 +309,54 @@ export default class Intro extends Component {
           <View style={styles.bottom}>
             <Button title="Pridėti" onPress={this.onAdd} />
           </View>
-          {this.state.showCalendar && (
+          {showWorkCalendar && (
             <View style={styles.calendar}>
               <Calendar
                 onDayPress={this.onDayPress}
                 markedDates={{
+                  ...markedDates,
                   [localDate]: {
+                    ...markedDates[localDate],
                     selected: true,
                     selectedColor: "blue"
                   }
                 }}
               />
-              <Button title="Uždaryti" onPress={this.toggleCalendar} />
+              <TouchableHighlight
+                onPress={this.switchToHolidayCalendar}
+                style={styles.switchCalendarButton}
+                underlayColor="#2f63b7"
+              >
+                <Text style={{ color: "#fff" }}>Nedarbo dienų kalendorius</Text>
+              </TouchableHighlight>
+              <Button
+                title="Uždaryti"
+                onPress={this.toggleCalendar.bind(this, "showWorkCalendar")}
+              />
+            </View>
+          )}
+          {showHolidayCalendar && (
+            <View style={{ ...styles.calendar, backgroundColor: "#333248" }}>
+              <Calendar
+                onDayPress={this.onHolidayPress}
+                markedDates={{
+                  ...markedDates,
+                  [localDate]: {
+                    ...markedDates[localDate],
+                    selected: true,
+                    selectedColor: "blue"
+                  }
+                }}
+                theme={{
+                  calendarBackground: "#333248",
+                  monthTextColor: "#fff",
+                  dayTextColor: "#fff"
+                }}
+              />
+              <Button
+                title="Uždaryti"
+                onPress={this.toggleCalendar.bind(this, "showHolidayCalendar")}
+              />
             </View>
           )}
         </LinearGradient>
@@ -280,8 +376,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     paddingTop: 15,
     paddingBottom: 15,
-    paddingLeft: 10,
-    paddingRight: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.2
@@ -290,6 +384,10 @@ const styles = StyleSheet.create({
     height: "100%",
     flexDirection: "row",
     alignItems: "center"
+  },
+  arrowContainer: {
+    paddingLeft: 10,
+    paddingRight: 10
   },
   arrow: {
     height: 20
@@ -319,6 +417,18 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 20,
     backgroundColor: "#fff"
+  },
+  switchCalendarButton: {
+    backgroundColor: "#4286f4",
+    alignSelf: "center",
+    paddingTop: 12,
+    paddingBottom: 12,
+    paddingLeft: 25,
+    paddingRight: 25,
+    borderRadius: 30,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.2
   },
   bottom: {
     position: "absolute",
