@@ -223,7 +223,9 @@ export default class Detail extends Component {
     const time = this.getTime();
     Communications.text(
       phone,
-      `Message related to an appointment at ${date} ${time}`
+      `${date.toLocaleDateString(
+        "lt-LT"
+      )} ${time}h\nSeskines g. 22\nGrozio studija artistic\nMeistre Viktorija\n\nPatvirtinkite atvykima sms zinute TAIP arba NE.\nNepatvirtinus vizito iki 15:00h jis bus automatiskai atsaukiamas.\nAtsiskaitymas tik grynais.`
     );
   };
 
