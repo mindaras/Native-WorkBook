@@ -3,7 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
-  FlatList,
+  ScrollView,
   TouchableOpacity,
   TouchableHighlight,
   Button,
@@ -12,11 +12,11 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo";
 import { AsyncStorage } from "react-native";
-import { prevArrow, nextArrow } from "../../assets";
+import { prevArrow, nextArrow, plusIcon } from "../../assets";
 import { Calendar, LocaleConfig } from "react-native-calendars";
 import { Detail } from "../detail";
 import { Add } from "../add";
-import { storageKey, markedDatesKey } from "../common";
+import { storageKey, markedDatesKey, workingHours } from "../common";
 
 LocaleConfig.locales["lt"] = {
   monthNames: [
@@ -142,49 +142,86 @@ export default class Intro extends Component {
     } catch (e) {}
   };
 
-  onAdd = () => {
+  onAdd = props => {
     this.props.navigator.push({
       component: Add,
       title: "Pridėti",
-      passProps: { date: this.state.date }
+      passProps: { date: this.state.date, ...props }
+    });
+  };
+
+  renderWorkingHours = () => {
+    return workingHours.map((hour, index) => {
+      const isFirst = index === 0;
+      const isLast = index === workingHours.length - 1;
+
+      return (
+        <View
+          key={hour}
+          style={{
+            borderTopLeftRadius: isFirst ? 4 : 0,
+            borderTopRightRadius: isFirst ? 4 : 0,
+            borderBottomLeftRadius: isLast ? 4 : 0,
+            borderBottomRightRadius: isLast ? 4 : 0,
+            ...styles.hourContainer
+          }}
+        >
+          <Text style={styles.hourText}>{hour}</Text>
+          <View style={styles.hourMidLine} />
+          <TouchableOpacity
+            style={styles.hourButton}
+            onPress={this.onAdd.bind(this, { hours: hour })}
+          >
+            <Image style={styles.hourButtonIcon} source={plusIcon} />
+          </TouchableOpacity>
+        </View>
+      );
     });
   };
 
   renderClients = () => {
     const { clients } = this.state;
 
-    return (
-      <FlatList
-        data={clients}
-        renderItem={({ item, index }) => {
-          const { time, name, duration, service, confirmed } = item;
-          const marginTop = index === 0 ? 20 : 0;
-          const marginBottom = index === clients.length - 1 ? 40 : 5;
+    return clients.map(item => {
+      const { time, name, duration, service, confirmed } = item;
+      const [hours, minutes] = time.split(":").map(t => parseInt(t, 10));
+      const firstWorkingHour = parseInt(workingHours[0].split(":"), 10);
+      const marginTop =
+        (hours - firstWorkingHour) * 100 +
+        (minutes > 0 ? (minutes * 100) / 60 : 0);
+      const height = parseFloat(duration.replace(":", ".")) * 100;
 
-          return (
-            <TouchableOpacity onPress={this.onClientPress.bind(this, item)}>
-              <View style={{ ...styles.listItem, marginTop, marginBottom }}>
-                <View>
-                  <Text style={{ fontWeight: "bold", marginBottom: 4 }}>
-                    {time}
-                  </Text>
-                  <Text style={styles.textMargin}>{name}</Text>
-                  <Text style={styles.textMargin}>Trukmė: {duration}</Text>
-                  <Text style={styles.textMargin}>{service}</Text>
-                </View>
-                <View>
-                  <Text style={{ marginBottom: 4 }}>Patvirtinta:</Text>
-                  <Switch
-                    value={confirmed}
-                    onValueChange={this.onConfirm.bind(this, time)}
-                  />
-                </View>
+      return (
+        <TouchableOpacity
+          key={time}
+          onPress={this.onClientPress.bind(this, item)}
+        >
+          <View
+            style={{
+              ...styles.listItem,
+              height,
+              marginTop
+            }}
+          >
+            <View style={styles.listItemContainer}>
+              <View>
+                <Text style={styles.listItemTime}>{time}</Text>
+                <Text style={styles.textMargin}>{name}</Text>
+                <Text style={styles.textMargin}>Trukmė: {duration}</Text>
+                <Text style={styles.textMargin}>{service}</Text>
               </View>
-            </TouchableOpacity>
-          );
-        }}
-      />
-    );
+              <View>
+                <Text style={{ marginBottom: 4 }}>Patvirtinta:</Text>
+                <Switch
+                  value={confirmed}
+                  onValueChange={this.onConfirm.bind(this, time)}
+                />
+              </View>
+            </View>
+          </View>
+        </TouchableOpacity>
+      );
+    });
   };
 
   updateDate = timestamp => {
@@ -297,15 +334,12 @@ export default class Intro extends Component {
               </TouchableOpacity>
             </View>
           </View>
-          <View
-            style={{
-              height: "85%",
-              paddingLeft: 10,
-              paddingRight: 10
-            }}
-          >
-            {this.renderClients()}
-          </View>
+          <ScrollView style={styles.itemContainer}>
+            <View style={{ height: workingHours.length * 100 + 40 }}>
+              {this.renderWorkingHours()}
+              <View style={styles.clientContainer}>{this.renderClients()}</View>
+            </View>
+          </ScrollView>
           <View style={styles.bottom}>
             <Button title="Pridėti" onPress={this.onAdd} />
           </View>
@@ -393,16 +427,26 @@ const styles = StyleSheet.create({
     height: 20
   },
   listItem: {
-    padding: 20,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    position: "absolute",
+    width: "100%",
+    paddingTop: 10,
+    paddingLeft: 20,
+    paddingRight: 20,
     backgroundColor: "#f4f4f4",
     borderRadius: 4,
     opacity: 0.8,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.2
+  },
+  listItemContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between"
+  },
+  listItemTime: {
+    fontWeight: "bold",
+    marginBottom: 4
   },
   textMargin: {
     marginBottom: 2
@@ -441,5 +485,45 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.2
+  },
+  hourContainer: {
+    borderWidth: 1,
+    borderColor: "#333",
+    height: 100
+  },
+  hourText: {
+    fontWeight: "bold",
+    color: "#333",
+    padding: 5
+  },
+  hourMidLine: {
+    position: "absolute",
+    top: "50%",
+    left: 0,
+    width: "100%",
+    height: 1,
+    backgroundColor: "#333"
+  },
+  hourButton: {
+    position: "absolute",
+    left: 5,
+    bottom: 5,
+    width: 20,
+    height: 20
+  },
+  hourButtonIcon: {
+    width: "100%",
+    height: "100%"
+  },
+  itemContainer: {
+    flexGrow: 0,
+    height: "85%",
+    paddingTop: 20,
+    paddingBottom: 200
+  },
+  clientContainer: {
+    position: "absolute",
+    left: "20%",
+    width: "80%"
   }
 });

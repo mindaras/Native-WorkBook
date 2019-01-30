@@ -221,6 +221,7 @@ export default class Detail extends Component {
   sendReminder = () => {
     const { phone, date } = this.state;
     const time = this.getTime();
+
     Communications.text(
       phone,
       `${date.toLocaleDateString(

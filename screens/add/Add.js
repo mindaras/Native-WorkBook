@@ -3,7 +3,7 @@ import { View, StyleSheet, TextInput, PickerIOS, Button } from "react-native";
 import { LinearGradient } from "expo";
 import { AsyncStorage } from "react-native";
 import { Intro } from "../intro";
-import { storageKey } from "../common";
+import { storageKey, workingHours } from "../common";
 
 export default class Add extends Component {
   state = {
@@ -12,7 +12,7 @@ export default class Add extends Component {
     service: "Korekcija",
     date: this.props.date,
     duration: "01:00",
-    hours: "08",
+    hours: this.props.hours || "08",
     minutes: "00",
     serviceFocused: false,
     durationFocused: false,
@@ -84,23 +84,7 @@ export default class Add extends Component {
   };
 
   renderHours = () => {
-    return this.renderPickerItems([
-      "08",
-      "09",
-      "10",
-      "11",
-      "12",
-      "13",
-      "14",
-      "15",
-      "16",
-      "17",
-      "18",
-      "19",
-      "20",
-      "21",
-      "22"
-    ]);
+    return this.renderPickerItems(workingHours);
   };
 
   renderMinutes = () => {
