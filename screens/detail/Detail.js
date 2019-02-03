@@ -224,9 +224,7 @@ export default class Detail extends Component {
 
     Communications.text(
       phone,
-      `${date.toLocaleDateString(
-        "lt-LT"
-      )} ${time}h\nSeskines g. 22\nGrozio studija artistic\nMeistre Viktorija\n\nPatvirtinkite atvykima sms zinute TAIP arba NE.\nNepatvirtinus vizito iki 15:00h jis bus automatiskai atsaukiamas.\nAtsiskaitymas tik grynais.`
+      `Message related to an appointment at ${date} ${time}`
     );
   };
 

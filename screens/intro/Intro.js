@@ -123,7 +123,6 @@ export default class Intro extends Component {
       title: client.name,
       passProps: { ...client, date: this.state.date }
     });
-    console.log("clientPressed");
   };
 
   onConfirm = async (time, value) => {
