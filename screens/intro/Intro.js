@@ -123,6 +123,7 @@ export default class Intro extends Component {
       title: client.name,
       passProps: { ...client, date: this.state.date }
     });
+    console.log("clientPressed");
   };
 
   onConfirm = async (time, value) => {
@@ -180,21 +181,22 @@ export default class Intro extends Component {
   };
 
   renderClients = () => {
-    const { clients } = this.state;
-
-    return clients.map(item => {
+    return this.state.clients.map(item => {
       const { time, name, duration, service, confirmed } = item;
       const [hours, minutes] = time.split(":").map(t => parseInt(t, 10));
       const firstWorkingHour = parseInt(workingHours[0].split(":"), 10);
-      const marginTop =
-        (hours - firstWorkingHour) * 100 +
-        (minutes > 0 ? (minutes * 100) / 60 : 0);
-      const height = parseFloat(duration.replace(":", ".")) * 100;
+      const marginTop = (hours - firstWorkingHour) * 100 + (minutes * 100) / 60;
+      const [durationHours, durationMinutes] = duration
+        .split(":")
+        .map(d => parseInt(d, 10));
+      const height = durationHours * 100 + (durationMinutes * 100) / 60;
 
       return (
         <TouchableOpacity
           key={time}
           onPress={this.onClientPress.bind(this, item)}
+          delayPressIn={200}
+          delayPressOut={200}
         >
           <View
             style={{
