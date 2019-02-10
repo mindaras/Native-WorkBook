@@ -184,11 +184,12 @@ export default class Intro extends Component {
       const { time, name, duration, service, confirmed } = item;
       const [hours, minutes] = time.split(":").map(t => parseInt(t, 10));
       const firstWorkingHour = parseInt(workingHours[0].split(":"), 10);
-      const marginTop = (hours - firstWorkingHour) * 100 + (minutes * 100) / 60;
+      const marginTop =
+        (hours - firstWorkingHour) * 100 + (minutes * 100) / 60 + 1;
       const [durationHours, durationMinutes] = duration
         .split(":")
         .map(d => parseInt(d, 10));
-      const height = durationHours * 100 + (durationMinutes * 100) / 60;
+      const height = durationHours * 100 + (durationMinutes * 100) / 60 - 2;
 
       return (
         <TouchableOpacity
