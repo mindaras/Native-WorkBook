@@ -10,33 +10,35 @@ import {
   Text,
   TouchableHighlight
 } from "react-native";
-import { LinearGradient } from "expo";
 import Communications from "react-native-communications";
-import { Intro } from "../intro";
 import { storageKey } from "../common";
 
 export default class Detail extends Component {
   constructor(props) {
     super(props);
 
-    const { name, phone, service, date, duration, time, confirmed } = props;
-    const [hours, minutes] = time.split(":");
+    const { navigation } = props;
+    const [hours, minutes] = props.navigation.getParam("time").split(":");
 
     this.state = {
-      name,
-      phone,
-      service,
-      date,
-      duration,
       hours,
       minutes,
-      confirmed,
+      name: navigation.getParam("name"),
+      phone: navigation.getParam("phone"),
+      service: navigation.getParam("service"),
+      date: navigation.getParam("date"),
+      duration: navigation.getParam("duration"),
+      confirmed: navigation.getParam("confirmed"),
       serviceFocused: false,
       durationFocused: false,
       dateFocused: false,
       modalVisible: false
     };
   }
+
+  static navigationOptions = {
+    title: "Detalės"
+  };
 
   inputs = [];
 
@@ -170,7 +172,7 @@ export default class Detail extends Component {
     const time = this.getTime();
     const clients = JSON.parse(await this.getClients()) || {};
 
-    delete clients[this.props.time];
+    delete clients[this.props.navigation.getParam("time")];
 
     try {
       await AsyncStorage.setItem(
@@ -181,16 +183,12 @@ export default class Detail extends Component {
         })
       );
 
-      this.props.navigator.push({
-        component: Intro,
-        title: "Klientai",
-        passProps: { date: this.state.date }
-      });
+      this.props.navigation.goBack();
     } catch (e) {}
   };
 
   removeClient = async () => {
-    const { date, time } = this.props;
+    const time = this.props.navigation.getParam("time");
     const clients = JSON.parse(await this.getClients()) || {};
 
     delete clients[time];
@@ -202,15 +200,7 @@ export default class Detail extends Component {
       );
 
       this.toggleModal();
-
-      this.props.navigator.resetTo({
-        component: Intro,
-        title: "Klientai",
-        passProps: {
-          date: this.state.date,
-          changed: `${date.toLocaleDateString("lt-LT")}-${time}`
-        }
-      });
+      this.props.navigation.goBack();
     } catch (e) {}
   };
 
@@ -245,11 +235,8 @@ export default class Detail extends Component {
     const time = this.getTime();
 
     return (
-      <View>
-        <LinearGradient
-          colors={["#22c1c3", "#fdbb2d"]}
-          style={styles.container}
-        >
+      <View style={styles.background}>
+        <View style={styles.container}>
           <View>
             <View style={{ alignItems: "flex-end" }}>
               <Button title="Atnaujinti" onPress={this.onSubmit} />
@@ -390,13 +377,16 @@ export default class Detail extends Component {
             </View>
           </Modal>
           <Button title="Pašalinti" onPress={this.toggleModal} color="red" />
-        </LinearGradient>
+        </View>
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
+  background: {
+    backgroundColor: "#d5a9ff"
+  },
   container: {
     paddingTop: 20,
     paddingLeft: 10,

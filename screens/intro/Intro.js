@@ -10,13 +10,11 @@ import {
   Switch,
   Image
 } from "react-native";
-import { LinearGradient } from "expo";
 import { AsyncStorage } from "react-native";
 import { prevArrow, nextArrow, plusIcon } from "../../assets";
 import { Calendar, LocaleConfig } from "react-native-calendars";
-import { Detail } from "../detail";
-import { Add } from "../add";
 import { storageKey, markedDatesKey, workingHours } from "../common";
+import { withNavigationFocus } from "react-navigation";
 
 LocaleConfig.locales["lt"] = {
   monthNames: [
@@ -61,7 +59,7 @@ LocaleConfig.locales["lt"] = {
 
 LocaleConfig.defaultLocale = "lt";
 
-export default class Intro extends Component {
+class Intro extends Component {
   state = {
     date: this.props.date,
     clients: [],
@@ -73,16 +71,19 @@ export default class Intro extends Component {
 
   static defaultProps = { date: new Date() };
 
+  static navigationOptions = {
+    title: "Klientai"
+  };
+
   componentDidMount = () => {
     this.retrieveClients();
     this.retrieveMarkedDates();
   };
 
-  componentWillReceiveProps = nextProps => {
-    const { changed } = this.props;
-
-    if (changed !== nextProps.added) this.retrieveClients();
-  };
+  componentDidUpdate(prevProps) {
+    const { isFocused } = this.props;
+    if (isFocused !== prevProps.isFocused && isFocused) this.retrieveClients();
+  }
 
   retrieveClients = async () => {
     const clients = this.sortClients((await this.getClients()) || {});
@@ -118,10 +119,9 @@ export default class Intro extends Component {
   };
 
   onClientPress = client => {
-    this.props.navigator.push({
-      component: Detail,
-      title: client.name,
-      passProps: { ...client, date: this.state.date }
+    this.props.navigation.navigate("Detail", {
+      ...client,
+      date: this.state.date
     });
   };
 
@@ -143,10 +143,9 @@ export default class Intro extends Component {
   };
 
   onAdd = props => {
-    this.props.navigator.push({
-      component: Add,
-      title: "Pridėti",
-      passProps: { date: this.state.date, ...props }
+    this.props.navigation.navigate("Add", {
+      date: this.state.date,
+      ...props
     });
   };
 
@@ -179,24 +178,48 @@ export default class Intro extends Component {
     });
   };
 
+  getItemOffset = (hours, minutes) => {
+    const firstWorkingHour = parseInt(workingHours[0].split(":"), 10);
+    const hourHeight = 100;
+    const borderHeight = 1;
+    return (
+      (hours - firstWorkingHour) * hourHeight +
+      (minutes * hourHeight) / 60 +
+      borderHeight
+    );
+  };
+
   renderClients = () => {
-    return this.state.clients.map(item => {
+    const lastItem = { hours: 0, minutes: 0, height: 0 };
+
+    return this.state.clients.map((item, i) => {
       const { time, name, duration, service, confirmed } = item;
       const [hours, minutes] = time.split(":").map(t => parseInt(t, 10));
-      const firstWorkingHour = parseInt(workingHours[0].split(":"), 10);
-      const marginTop =
-        (hours - firstWorkingHour) * 100 + (minutes * 100) / 60 + 1;
+
+      let marginTop = 0;
+
+      if (i === 0) marginTop = this.getItemOffset(hours, minutes);
+      else {
+        const totalNeededOffset = this.getItemOffset(hours, minutes);
+        const lastItemOffset = this.getItemOffset(
+          lastItem.hours,
+          lastItem.minutes
+        );
+        marginTop = totalNeededOffset - lastItemOffset - lastItem.height;
+      }
+
       const [durationHours, durationMinutes] = duration
         .split(":")
         .map(d => parseInt(d, 10));
       const height = durationHours * 100 + (durationMinutes * 100) / 60 - 2;
+      lastItem.hours = hours;
+      lastItem.minutes = minutes;
+      lastItem.height = height;
 
       return (
         <TouchableOpacity
           key={time}
           onPress={this.onClientPress.bind(this, item)}
-          delayPressIn={200}
-          delayPressOut={200}
         >
           <View
             style={{
@@ -299,11 +322,8 @@ export default class Intro extends Component {
     const localDate = date.toLocaleDateString("lt-LT");
 
     return (
-      <View>
-        <LinearGradient
-          colors={["#22c1c3", "#fdbb2d"]}
-          style={styles.container}
-        >
+      <View style={styles.background}>
+        <View style={styles.container}>
           <View style={styles.top}>
             <View style={{ width: "25%", alignItems: "flex-start" }}>
               <TouchableOpacity
@@ -395,13 +415,18 @@ export default class Intro extends Component {
               />
             </View>
           )}
-        </LinearGradient>
+        </View>
       </View>
     );
   }
 }
 
+export default withNavigationFocus(Intro);
+
 const styles = StyleSheet.create({
+  background: {
+    backgroundColor: "#d5a9ff"
+  },
   container: {
     height: "95%"
   },
@@ -429,8 +454,7 @@ const styles = StyleSheet.create({
     height: 20
   },
   listItem: {
-    position: "absolute",
-    width: "100%",
+    position: "relative",
     paddingTop: 10,
     paddingLeft: 20,
     paddingRight: 20,

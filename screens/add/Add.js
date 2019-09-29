@@ -1,22 +1,28 @@
 import React, { Component } from "react";
 import { View, StyleSheet, TextInput, PickerIOS, Button } from "react-native";
-import { LinearGradient } from "expo";
 import { AsyncStorage } from "react-native";
-import { Intro } from "../intro";
 import { storageKey, workingHours } from "../common";
 
 export default class Add extends Component {
-  state = {
-    name: "",
-    phone: "+3706",
-    service: "Korekcija",
-    date: this.props.date,
-    duration: "01:00",
-    hours: this.props.hours || "08",
-    minutes: "00",
-    serviceFocused: false,
-    durationFocused: false,
-    dateFocused: false
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      name: "",
+      phone: "+3706",
+      service: "Korekcija",
+      date: props.navigation.getParam("date"),
+      duration: "01:00",
+      hours: props.navigation.getParam("hours") || "08",
+      minutes: "00",
+      serviceFocused: false,
+      durationFocused: false,
+      dateFocused: false
+    };
+  }
+
+  static navigationOptions = {
+    title: "Pridėti"
   };
 
   inputs = [];
@@ -152,14 +158,7 @@ export default class Add extends Component {
         })
       );
 
-      this.props.navigator.resetTo({
-        component: Intro,
-        title: "Klientai",
-        passProps: {
-          date,
-          changed: `${date.toLocaleDateString("lt-LT")}-${time}`
-        }
-      });
+      this.props.navigation.goBack();
     } catch (e) {}
   };
 
@@ -179,11 +178,8 @@ export default class Add extends Component {
     const time = this.getTime();
 
     return (
-      <View>
-        <LinearGradient
-          colors={["#22c1c3", "#fdbb2d"]}
-          style={styles.container}
-        >
+      <View style={styles.background}>
+        <View style={styles.container}>
           <View style={{ alignItems: "flex-end" }}>
             <Button title="Išsaugoti" onPress={this.onSubmit} />
           </View>
@@ -290,13 +286,16 @@ export default class Add extends Component {
               </PickerIOS>
             </View>
           )}
-        </LinearGradient>
+        </View>
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
+  background: {
+    backgroundColor: "#d5a9ff"
+  },
   container: {
     paddingTop: 20,
     paddingLeft: 10,
