@@ -8,10 +8,12 @@ import {
   Button,
   Modal,
   Text,
-  TouchableHighlight
+  TouchableHighlight,
+  Image
 } from "react-native";
 import Communications from "react-native-communications";
 import { storageKey } from "../common";
+import { backgroundImage } from "../../assets";
 
 export default class Detail extends Component {
   constructor(props) {
@@ -212,10 +214,7 @@ export default class Detail extends Component {
     const { phone, date } = this.state;
     const time = this.getTime();
 
-    Communications.text(
-      phone,
-      `Message related to an appointment at ${date} ${time}`
-    );
+    Communications.text(phone, `message realted to date and time`);
   };
 
   render() {
@@ -235,7 +234,12 @@ export default class Detail extends Component {
     const time = this.getTime();
 
     return (
-      <View style={styles.background}>
+      <View>
+        <Image
+          style={styles.background}
+          source={backgroundImage}
+          resizeMode="cover"
+        />
         <View style={styles.container}>
           <View>
             <View style={{ alignItems: "flex-end" }}>
@@ -385,14 +389,18 @@ export default class Detail extends Component {
 
 const styles = StyleSheet.create({
   background: {
-    backgroundColor: "#d5a9ff"
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%"
   },
   container: {
     paddingTop: 20,
     paddingLeft: 10,
     paddingRight: 10,
     paddingBottom: 20,
-    height: "95%",
+    height: "100%",
     justifyContent: "space-between"
   },
   input: {

@@ -1,7 +1,15 @@
 import React, { Component } from "react";
-import { View, StyleSheet, TextInput, PickerIOS, Button } from "react-native";
+import {
+  View,
+  StyleSheet,
+  TextInput,
+  PickerIOS,
+  Button,
+  Image
+} from "react-native";
 import { AsyncStorage } from "react-native";
 import { storageKey, workingHours } from "../common";
+import { backgroundImage } from "../../assets";
 
 export default class Add extends Component {
   constructor(props) {
@@ -178,7 +186,12 @@ export default class Add extends Component {
     const time = this.getTime();
 
     return (
-      <View style={styles.background}>
+      <View>
+        <Image
+          style={styles.background}
+          source={backgroundImage}
+          resizeMode="cover"
+        />
         <View style={styles.container}>
           <View style={{ alignItems: "flex-end" }}>
             <Button title="Išsaugoti" onPress={this.onSubmit} />
@@ -294,7 +307,11 @@ export default class Add extends Component {
 
 const styles = StyleSheet.create({
   background: {
-    backgroundColor: "#d5a9ff"
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%"
   },
   container: {
     paddingTop: 20,

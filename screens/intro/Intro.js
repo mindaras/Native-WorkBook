@@ -11,7 +11,7 @@ import {
   Image
 } from "react-native";
 import { AsyncStorage } from "react-native";
-import { prevArrow, nextArrow, plusIcon } from "../../assets";
+import { prevArrow, nextArrow, plusIcon, backgroundImage } from "../../assets";
 import { Calendar, LocaleConfig } from "react-native-calendars";
 import { storageKey, markedDatesKey, workingHours } from "../common";
 import { withNavigationFocus } from "react-navigation";
@@ -275,7 +275,7 @@ class Intro extends Component {
   };
 
   onHolidayPress = async ({ timestamp }) => {
-    const { date, markedDates } = this.state;
+    const { markedDates } = this.state;
     const localDate = new Date(timestamp).toLocaleDateString("lt-LT");
     const isMarked = markedDates[localDate];
     const updatedMarkedDates = { ...markedDates };
@@ -322,100 +322,103 @@ class Intro extends Component {
     const localDate = date.toLocaleDateString("lt-LT");
 
     return (
-      <View style={styles.background}>
-        <View style={styles.container}>
-          <View style={styles.top}>
-            <View style={{ width: "25%", alignItems: "flex-start" }}>
-              <TouchableOpacity
-                onPress={this.changeDay}
-                style={styles.arrowContainer}
-              >
-                <Image
-                  source={prevArrow}
-                  resizeMode="contain"
-                  style={styles.arrow}
-                />
-              </TouchableOpacity>
-            </View>
+      <View style={styles.container}>
+        <Image
+          style={styles.background}
+          source={backgroundImage}
+          resizeMode="cover"
+        />
+        <View style={styles.top}>
+          <View style={{ width: "25%", alignItems: "flex-start" }}>
             <TouchableOpacity
-              style={styles.date}
-              onPress={this.toggleCalendar.bind(this, "showWorkCalendar")}
+              onPress={this.changeDay}
+              style={styles.arrowContainer}
             >
-              <Text style={{ fontWeight: "bold" }}>{localDate}</Text>
+              <Image
+                source={prevArrow}
+                resizeMode="contain"
+                style={styles.arrow}
+              />
             </TouchableOpacity>
-            <View style={{ width: "25%", alignItems: "flex-end" }}>
-              <TouchableOpacity
-                onPress={this.changeDay.bind(this, "next")}
-                style={styles.arrowContainer}
-              >
-                <Image
-                  source={nextArrow}
-                  resizeMode="contain"
-                  style={styles.arrow}
-                />
-              </TouchableOpacity>
-            </View>
           </View>
-          <ScrollView style={styles.itemContainer}>
-            <View style={{ height: workingHours.length * 100 + 40 }}>
-              {this.renderWorkingHours()}
-              <View style={styles.clientContainer}>{this.renderClients()}</View>
-            </View>
-          </ScrollView>
-          <View style={styles.bottom}>
-            <Button title="Pridėti" onPress={this.onAdd} />
+          <TouchableOpacity
+            style={styles.date}
+            onPress={this.toggleCalendar.bind(this, "showWorkCalendar")}
+          >
+            <Text style={{ fontWeight: "bold" }}>{localDate}</Text>
+          </TouchableOpacity>
+          <View style={{ width: "25%", alignItems: "flex-end" }}>
+            <TouchableOpacity
+              onPress={this.changeDay.bind(this, "next")}
+              style={styles.arrowContainer}
+            >
+              <Image
+                source={nextArrow}
+                resizeMode="contain"
+                style={styles.arrow}
+              />
+            </TouchableOpacity>
           </View>
-          {showWorkCalendar && (
-            <View style={styles.calendar}>
-              <Calendar
-                onDayPress={this.onDayPress}
-                markedDates={{
-                  ...markedDates,
-                  [localDate]: {
-                    ...markedDates[localDate],
-                    selected: true,
-                    selectedColor: "blue"
-                  }
-                }}
-              />
-              <TouchableHighlight
-                onPress={this.switchToHolidayCalendar}
-                style={styles.switchCalendarButton}
-                underlayColor="#2f63b7"
-              >
-                <Text style={{ color: "#fff" }}>Nedarbo dienų kalendorius</Text>
-              </TouchableHighlight>
-              <Button
-                title="Uždaryti"
-                onPress={this.toggleCalendar.bind(this, "showWorkCalendar")}
-              />
-            </View>
-          )}
-          {showHolidayCalendar && (
-            <View style={{ ...styles.calendar, backgroundColor: "#333248" }}>
-              <Calendar
-                onDayPress={this.onHolidayPress}
-                markedDates={{
-                  ...markedDates,
-                  [localDate]: {
-                    ...markedDates[localDate],
-                    selected: true,
-                    selectedColor: "blue"
-                  }
-                }}
-                theme={{
-                  calendarBackground: "#333248",
-                  monthTextColor: "#fff",
-                  dayTextColor: "#fff"
-                }}
-              />
-              <Button
-                title="Uždaryti"
-                onPress={this.toggleCalendar.bind(this, "showHolidayCalendar")}
-              />
-            </View>
-          )}
         </View>
+        <ScrollView style={styles.itemContainer}>
+          <View style={{ height: workingHours.length * 100 + 40 }}>
+            {this.renderWorkingHours()}
+            <View style={styles.clientContainer}>{this.renderClients()}</View>
+          </View>
+        </ScrollView>
+        <View style={styles.bottom}>
+          <Button title="Pridėti" onPress={this.onAdd} />
+        </View>
+        {showWorkCalendar && (
+          <View style={styles.calendar}>
+            <Calendar
+              onDayPress={this.onDayPress}
+              markedDates={{
+                ...markedDates,
+                [localDate]: {
+                  ...markedDates[localDate],
+                  selected: true,
+                  selectedColor: "blue"
+                }
+              }}
+            />
+            <TouchableHighlight
+              onPress={this.switchToHolidayCalendar}
+              style={styles.switchCalendarButton}
+              underlayColor="#2f63b7"
+            >
+              <Text style={{ color: "#fff" }}>Nedarbo dienų kalendorius</Text>
+            </TouchableHighlight>
+            <Button
+              title="Uždaryti"
+              onPress={this.toggleCalendar.bind(this, "showWorkCalendar")}
+            />
+          </View>
+        )}
+        {showHolidayCalendar && (
+          <View style={{ ...styles.calendar, backgroundColor: "#333248" }}>
+            <Calendar
+              onDayPress={this.onHolidayPress}
+              markedDates={{
+                ...markedDates,
+                [localDate]: {
+                  ...markedDates[localDate],
+                  selected: true,
+                  selectedColor: "blue"
+                }
+              }}
+              theme={{
+                calendarBackground: "#333248",
+                monthTextColor: "#fff",
+                dayTextColor: "#fff"
+              }}
+            />
+            <Button
+              title="Uždaryti"
+              onPress={this.toggleCalendar.bind(this, "showHolidayCalendar")}
+            />
+          </View>
+        )}
       </View>
     );
   }
@@ -425,10 +428,14 @@ export default withNavigationFocus(Intro);
 
 const styles = StyleSheet.create({
   background: {
-    backgroundColor: "#d5a9ff"
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%"
   },
   container: {
-    height: "95%"
+    height: "100%"
   },
   top: {
     justifyContent: "space-between",
