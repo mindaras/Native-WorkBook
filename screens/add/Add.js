@@ -5,9 +5,9 @@ import {
   TextInput,
   PickerIOS,
   Button,
-  Image
+  Image,
 } from "react-native";
-import { AsyncStorage } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { storageKey, workingHours } from "../common";
 import { backgroundImage } from "../../assets";
 
@@ -19,18 +19,18 @@ export default class Add extends Component {
       name: "",
       phone: "+3706",
       service: "Korekcija",
-      date: props.navigation.getParam("date"),
+      date: props.route.params.date,
       duration: "01:00",
-      hours: props.navigation.getParam("hours") || "08",
+      hours: props.route.params.hours || "07",
       minutes: "00",
       serviceFocused: false,
       durationFocused: false,
-      dateFocused: false
+      dateFocused: false,
     };
   }
 
   static navigationOptions = {
-    title: "Pridėti"
+    title: "Pridėti",
   };
 
   inputs = [];
@@ -39,31 +39,31 @@ export default class Add extends Component {
     this.setState({ [key]: value });
   };
 
-  togglePicker = key => {
+  togglePicker = (key) => {
     const { serviceFocused, durationFocused, dateFocused } = this.state;
 
-    this.inputs.forEach(input => input && input.blur());
+    this.inputs.forEach((input) => input && input.blur());
 
     switch (key) {
       case "service":
         this.setState(() => ({
           serviceFocused: !serviceFocused,
           durationFocused: false,
-          dateFocused: false
+          dateFocused: false,
         }));
         break;
       case "duration":
         this.setState(() => ({
           durationFocused: !durationFocused,
           serviceFocused: false,
-          dateFocused: false
+          dateFocused: false,
         }));
         break;
       case "date":
         this.setState(() => ({
           dateFocused: !dateFocused,
           serviceFocused: false,
-          durationFocused: false
+          durationFocused: false,
         }));
         break;
       default:
@@ -71,8 +71,8 @@ export default class Add extends Component {
     }
   };
 
-  renderPickerItems = values => {
-    return values.map(value => (
+  renderPickerItems = (values) => {
+    return values.map((value) => (
       <PickerIOS.Item key={value} label={value} value={value} />
     ));
   };
@@ -83,7 +83,7 @@ export default class Add extends Component {
       "Ilgalaikis lakavimas",
       "Nagų priauginimas",
       "Pedikiūras",
-      "Kojų ilgalaikis lakavimas"
+      "Kojų ilgalaikis lakavimas",
     ]);
   };
 
@@ -93,7 +93,7 @@ export default class Add extends Component {
       "01:30",
       "02:00",
       "02:30",
-      "03:00"
+      "03:00",
     ]);
   };
 
@@ -114,7 +114,7 @@ export default class Add extends Component {
       "40",
       "45",
       "50",
-      "55"
+      "55",
     ]);
   };
 
@@ -161,8 +161,8 @@ export default class Add extends Component {
             name,
             duration,
             service,
-            confirmed: false
-          }
+            confirmed: false,
+          },
         })
       );
 
@@ -181,7 +181,7 @@ export default class Add extends Component {
       date,
       serviceFocused,
       durationFocused,
-      dateFocused
+      dateFocused,
     } = this.state;
     const time = this.getTime();
 
@@ -204,7 +204,7 @@ export default class Add extends Component {
             autoCapitalize="words"
             style={styles.input}
             placeholder="Vardas"
-            ref={component => (this.inputs = [...this.inputs, component])}
+            ref={(component) => (this.inputs = [...this.inputs, component])}
           />
           <TextInput
             onChangeText={this.onChange.bind(this, "phone")}
@@ -213,7 +213,7 @@ export default class Add extends Component {
             keyboardType="numbers-and-punctuation"
             style={styles.input}
             placeholder="Telefonas"
-            ref={component => (this.inputs = [...this.inputs, component])}
+            ref={(component) => (this.inputs = [...this.inputs, component])}
           />
           <View style={{ position: "relative" }}>
             <TextInput
@@ -280,7 +280,7 @@ export default class Add extends Component {
             <View
               style={{
                 flexDirection: "row",
-                alignItems: "center"
+                alignItems: "center",
               }}
             >
               <PickerIOS
@@ -311,24 +311,24 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     width: "100%",
-    height: "100%"
+    height: "100%",
   },
   container: {
     paddingTop: 20,
     paddingLeft: 10,
     paddingRight: 10,
-    height: "100%"
+    height: "100%",
   },
   input: {
     padding: 10,
     borderBottomWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.2)",
     marginBottom: 10,
-    borderRadius: 4
+    borderRadius: 4,
   },
   inputButton: {
     position: "absolute",
     top: -4,
-    right: 20
-  }
+    right: 20,
+  },
 });

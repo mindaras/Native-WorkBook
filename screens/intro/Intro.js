@@ -8,13 +8,12 @@ import {
   TouchableHighlight,
   Button,
   Switch,
-  Image
+  Image,
 } from "react-native";
-import { AsyncStorage } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { prevArrow, nextArrow, plusIcon, backgroundImage } from "../../assets";
 import { Calendar, LocaleConfig } from "react-native-calendars";
 import { storageKey, markedDatesKey, workingHours } from "../common";
-import { withNavigationFocus } from "react-navigation";
 
 LocaleConfig.locales["lt"] = {
   monthNames: [
@@ -29,7 +28,7 @@ LocaleConfig.locales["lt"] = {
     "Rugsėjis",
     "Spalis",
     "Lapkritis",
-    "Gruodis"
+    "Gruodis",
   ],
   monthNamesShort: [
     "Saus.",
@@ -43,7 +42,7 @@ LocaleConfig.locales["lt"] = {
     "Rugs.",
     "Spal.",
     "Lap.",
-    "Gruod."
+    "Gruod.",
   ],
   dayNames: [
     "Sekmadienis",
@@ -52,9 +51,9 @@ LocaleConfig.locales["lt"] = {
     "Trečiadienis",
     "Ketvirtadienis",
     "Penktadienis",
-    "Šeštadienis"
+    "Šeštadienis",
   ],
-  dayNamesShort: ["Sek.", "Pir.", "Ant.", "Tre.", "Ket.", "Pen.", "Šeš."]
+  dayNamesShort: ["Sek.", "Pir.", "Ant.", "Tre.", "Ket.", "Pen.", "Šeš."],
 };
 
 LocaleConfig.defaultLocale = "lt";
@@ -66,24 +65,20 @@ class Intro extends Component {
     markedDates: {},
     showWorkCalendar: false,
     showHolidayCalendar: false,
-    reset: false
+    reset: false,
   };
 
   static defaultProps = { date: new Date() };
 
   static navigationOptions = {
-    title: "Klientai"
+    title: "Klientai",
   };
 
   componentDidMount = () => {
     this.retrieveClients();
     this.retrieveMarkedDates();
+    this.props.navigation.addListener("focus", this.retrieveClients);
   };
-
-  componentDidUpdate(prevProps) {
-    const { isFocused } = this.props;
-    if (isFocused !== prevProps.isFocused && isFocused) this.retrieveClients();
-  }
 
   retrieveClients = async () => {
     const clients = this.sortClients((await this.getClients()) || {});
@@ -91,7 +86,7 @@ class Intro extends Component {
     this.setState({ clients });
   };
 
-  sortClients = clients => {
+  sortClients = (clients) => {
     let sortedClients = Object.values(clients);
 
     sortedClients.sort((a, b) => {
@@ -118,10 +113,10 @@ class Intro extends Component {
     } catch (e) {}
   };
 
-  onClientPress = client => {
+  onClientPress = (client) => {
     this.props.navigation.navigate("Detail", {
       ...client,
-      date: this.state.date
+      date: this.state.date,
     });
   };
 
@@ -129,7 +124,7 @@ class Intro extends Component {
     const clients = (await this.getClients()) || {};
     const updatedClients = {
       ...clients,
-      [time]: { ...clients[time], confirmed: value }
+      [time]: { ...clients[time], confirmed: value },
     };
 
     try {
@@ -142,10 +137,10 @@ class Intro extends Component {
     } catch (e) {}
   };
 
-  onAdd = props => {
+  onAdd = (props) => {
     this.props.navigation.navigate("Add", {
       date: this.state.date,
-      ...props
+      ...props,
     });
   };
 
@@ -162,7 +157,7 @@ class Intro extends Component {
             borderTopRightRadius: isFirst ? 4 : 0,
             borderBottomLeftRadius: isLast ? 4 : 0,
             borderBottomRightRadius: isLast ? 4 : 0,
-            ...styles.hourContainer
+            ...styles.hourContainer,
           }}
         >
           <Text style={styles.hourText}>{hour}</Text>
@@ -194,7 +189,7 @@ class Intro extends Component {
 
     return this.state.clients.map((item, i) => {
       const { time, name, duration, service, confirmed } = item;
-      const [hours, minutes] = time.split(":").map(t => parseInt(t, 10));
+      const [hours, minutes] = time.split(":").map((t) => parseInt(t, 10));
 
       let marginTop = 0;
 
@@ -210,7 +205,7 @@ class Intro extends Component {
 
       const [durationHours, durationMinutes] = duration
         .split(":")
-        .map(d => parseInt(d, 10));
+        .map((d) => parseInt(d, 10));
       const height = durationHours * 100 + (durationMinutes * 100) / 60 - 2;
       lastItem.hours = hours;
       lastItem.minutes = minutes;
@@ -225,7 +220,7 @@ class Intro extends Component {
             style={{
               ...styles.listItem,
               height,
-              marginTop
+              marginTop,
             }}
           >
             <View style={styles.listItemContainer}>
@@ -249,11 +244,11 @@ class Intro extends Component {
     });
   };
 
-  updateDate = timestamp => {
+  updateDate = (timestamp) => {
     this.setState({ date: new Date(timestamp) }, this.retrieveClients);
   };
 
-  changeDay = direction => {
+  changeDay = (direction) => {
     const { date } = this.state;
     const newDate =
       direction === "next" ? date.getDate() + 1 : date.getDate() - 1;
@@ -261,8 +256,8 @@ class Intro extends Component {
     this.updateDate(date.setDate(newDate));
   };
 
-  toggleCalendar = calendar => {
-    this.setState(prevState => ({ [calendar]: !prevState[calendar] }));
+  toggleCalendar = (calendar) => {
+    this.setState((prevState) => ({ [calendar]: !prevState[calendar] }));
   };
 
   switchToHolidayCalendar = () => {
@@ -286,7 +281,7 @@ class Intro extends Component {
       updatedMarkedDates[localDate] = {
         marked: true,
         dotColor: "red",
-        selectedColor: "blue"
+        selectedColor: "blue",
       };
     }
 
@@ -317,7 +312,7 @@ class Intro extends Component {
       date,
       markedDates,
       showWorkCalendar,
-      showHolidayCalendar
+      showHolidayCalendar,
     } = this.state;
     const localDate = date.toLocaleDateString("lt-LT");
 
@@ -378,8 +373,8 @@ class Intro extends Component {
                 [localDate]: {
                   ...markedDates[localDate],
                   selected: true,
-                  selectedColor: "blue"
-                }
+                  selectedColor: "blue",
+                },
               }}
             />
             <TouchableHighlight
@@ -404,13 +399,13 @@ class Intro extends Component {
                 [localDate]: {
                   ...markedDates[localDate],
                   selected: true,
-                  selectedColor: "blue"
-                }
+                  selectedColor: "blue",
+                },
               }}
               theme={{
                 calendarBackground: "#333248",
                 monthTextColor: "#fff",
-                dayTextColor: "#fff"
+                dayTextColor: "#fff",
               }}
             />
             <Button
@@ -424,7 +419,7 @@ class Intro extends Component {
   }
 }
 
-export default withNavigationFocus(Intro);
+export default Intro;
 
 const styles = StyleSheet.create({
   background: {
@@ -432,10 +427,10 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     width: "100%",
-    height: "100%"
+    height: "100%",
   },
   container: {
-    height: "100%"
+    height: "100%",
   },
   top: {
     justifyContent: "space-between",
@@ -446,19 +441,19 @@ const styles = StyleSheet.create({
     paddingBottom: 15,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.2
+    shadowOpacity: 0.2,
   },
   date: {
     height: "100%",
     flexDirection: "row",
-    alignItems: "center"
+    alignItems: "center",
   },
   arrowContainer: {
     paddingLeft: 10,
-    paddingRight: 10
+    paddingRight: 10,
   },
   arrow: {
-    height: 20
+    height: 20,
   },
   listItem: {
     position: "relative",
@@ -470,19 +465,19 @@ const styles = StyleSheet.create({
     opacity: 0.8,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2
+    shadowOpacity: 0.2,
   },
   listItemContainer: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
   },
   listItemTime: {
     fontWeight: "bold",
-    marginBottom: 4
+    marginBottom: 4,
   },
   textMargin: {
-    marginBottom: 2
+    marginBottom: 2,
   },
   calendar: {
     position: "absolute",
@@ -493,7 +488,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingTop: 10,
     paddingBottom: 20,
-    backgroundColor: "#fff"
+    backgroundColor: "#fff",
   },
   switchCalendarButton: {
     backgroundColor: "#4286f4",
@@ -505,7 +500,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2
+    shadowOpacity: 0.2,
   },
   bottom: {
     position: "absolute",
@@ -517,17 +512,17 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.2
+    shadowOpacity: 0.2,
   },
   hourContainer: {
     borderWidth: 1,
     borderColor: "#333",
-    height: 100
+    height: 100,
   },
   hourText: {
     fontWeight: "bold",
     color: "#333",
-    padding: 5
+    padding: 5,
   },
   hourMidLine: {
     position: "absolute",
@@ -535,28 +530,28 @@ const styles = StyleSheet.create({
     left: 0,
     width: "100%",
     height: 1,
-    backgroundColor: "#333"
+    backgroundColor: "#333",
   },
   hourButton: {
     position: "absolute",
     left: 5,
     bottom: 5,
     width: 20,
-    height: 20
+    height: 20,
   },
   hourButtonIcon: {
     width: "100%",
-    height: "100%"
+    height: "100%",
   },
   itemContainer: {
     flexGrow: 0,
     height: "85%",
     paddingTop: 20,
-    paddingBottom: 200
+    paddingBottom: 200,
   },
   clientContainer: {
     position: "absolute",
     left: "20%",
-    width: "80%"
-  }
+    width: "80%",
+  },
 });

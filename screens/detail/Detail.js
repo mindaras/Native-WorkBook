@@ -4,42 +4,41 @@ import {
   StyleSheet,
   TextInput,
   PickerIOS,
-  AsyncStorage,
   Button,
   Modal,
   Text,
   TouchableHighlight,
-  Image
+  Image,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Communications from "react-native-communications";
-import { storageKey } from "../common";
+import { storageKey, workingHours } from "../common";
 import { backgroundImage } from "../../assets";
 
 export default class Detail extends Component {
   constructor(props) {
     super(props);
 
-    const { navigation } = props;
-    const [hours, minutes] = props.navigation.getParam("time").split(":");
+    const [hours, minutes] = props.route.params.time.split(":");
 
     this.state = {
       hours,
       minutes,
-      name: navigation.getParam("name"),
-      phone: navigation.getParam("phone"),
-      service: navigation.getParam("service"),
-      date: navigation.getParam("date"),
-      duration: navigation.getParam("duration"),
-      confirmed: navigation.getParam("confirmed"),
+      name: this.props.route.params.name,
+      phone: this.props.route.params.phone,
+      service: this.props.route.params.service,
+      date: this.props.route.params.date,
+      duration: this.props.route.params.duration,
+      confirmed: this.props.route.params.confirmed,
       serviceFocused: false,
       durationFocused: false,
       dateFocused: false,
-      modalVisible: false
+      modalVisible: false,
     };
   }
 
   static navigationOptions = {
-    title: "Detalės"
+    title: "Detalės",
   };
 
   inputs = [];
@@ -48,31 +47,31 @@ export default class Detail extends Component {
     this.setState({ [key]: value });
   };
 
-  togglePicker = key => {
+  togglePicker = (key) => {
     const { serviceFocused, durationFocused, dateFocused } = this.state;
 
-    this.inputs.forEach(input => input && input.blur());
+    this.inputs.forEach((input) => input && input.blur());
 
     switch (key) {
       case "service":
         this.setState(() => ({
           serviceFocused: !serviceFocused,
           durationFocused: false,
-          dateFocused: false
+          dateFocused: false,
         }));
         break;
       case "duration":
         this.setState(() => ({
           durationFocused: !durationFocused,
           serviceFocused: false,
-          dateFocused: false
+          dateFocused: false,
         }));
         break;
       case "date":
         this.setState(() => ({
           dateFocused: !dateFocused,
           serviceFocused: false,
-          durationFocused: false
+          durationFocused: false,
         }));
         break;
       default:
@@ -80,8 +79,8 @@ export default class Detail extends Component {
     }
   };
 
-  renderPickerItems = values => {
-    return values.map(value => (
+  renderPickerItems = (values) => {
+    return values.map((value) => (
       <PickerIOS.Item key={value} label={value} value={value} />
     ));
   };
@@ -92,7 +91,7 @@ export default class Detail extends Component {
       "Ilgalaikis lakavimas",
       "Nagų priauginimas",
       "Pedikiūras",
-      "Kojų ilgalaikis lakavimas"
+      "Kojų ilgalaikis lakavimas",
     ]);
   };
 
@@ -102,28 +101,12 @@ export default class Detail extends Component {
       "01:30",
       "02:00",
       "02:30",
-      "03:00"
+      "03:00",
     ]);
   };
 
   renderHours = () => {
-    return this.renderPickerItems([
-      "08",
-      "09",
-      "10",
-      "11",
-      "12",
-      "13",
-      "14",
-      "15",
-      "16",
-      "17",
-      "18",
-      "19",
-      "20",
-      "21",
-      "22"
-    ]);
+    return this.renderPickerItems(workingHours);
   };
 
   renderMinutes = () => {
@@ -139,7 +122,7 @@ export default class Detail extends Component {
       "40",
       "45",
       "50",
-      "55"
+      "55",
     ]);
   };
 
@@ -174,14 +157,22 @@ export default class Detail extends Component {
     const time = this.getTime();
     const clients = JSON.parse(await this.getClients()) || {};
 
-    delete clients[this.props.navigation.getParam("time")];
+    delete clients[this.props.route.params.time];
 
     try {
       await AsyncStorage.setItem(
         `${storageKey}-${date.toLocaleDateString("lt-LT")}`,
         JSON.stringify({
           ...clients,
-          [time]: { key: time, time, phone, name, duration, service, confirmed }
+          [time]: {
+            key: time,
+            time,
+            phone,
+            name,
+            duration,
+            service,
+            confirmed,
+          },
         })
       );
 
@@ -190,7 +181,7 @@ export default class Detail extends Component {
   };
 
   removeClient = async () => {
-    const time = this.props.navigation.getParam("time");
+    const time = this.props.route.params.time;
     const clients = JSON.parse(await this.getClients()) || {};
 
     delete clients[time];
@@ -207,7 +198,7 @@ export default class Detail extends Component {
   };
 
   toggleModal = () => {
-    this.setState(prevState => ({ modalVisible: !prevState.modalVisible }));
+    this.setState((prevState) => ({ modalVisible: !prevState.modalVisible }));
   };
 
   sendReminder = () => {
@@ -229,7 +220,7 @@ export default class Detail extends Component {
       serviceFocused,
       durationFocused,
       dateFocused,
-      modalVisible
+      modalVisible,
     } = this.state;
     const time = this.getTime();
 
@@ -252,7 +243,7 @@ export default class Detail extends Component {
               autoCapitalize="words"
               style={styles.input}
               placeholder="Vardas"
-              ref={component => (this.inputs = [...this.inputs, component])}
+              ref={(component) => (this.inputs = [...this.inputs, component])}
             />
             <TextInput
               onChangeText={this.onChange.bind(this, "phone")}
@@ -261,7 +252,7 @@ export default class Detail extends Component {
               keyboardType="numbers-and-punctuation"
               style={styles.input}
               placeholder="Telefonas"
-              ref={component => (this.inputs = [...this.inputs, component])}
+              ref={(component) => (this.inputs = [...this.inputs, component])}
             />
             <View style={{ position: "relative" }}>
               <TextInput
@@ -335,7 +326,7 @@ export default class Detail extends Component {
               <View
                 style={{
                   flexDirection: "row",
-                  alignItems: "center"
+                  alignItems: "center",
                 }}
               >
                 <PickerIOS
@@ -393,7 +384,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     width: "100%",
-    height: "100%"
+    height: "100%",
   },
   container: {
     paddingTop: 20,
@@ -401,19 +392,19 @@ const styles = StyleSheet.create({
     paddingRight: 10,
     paddingBottom: 20,
     height: "100%",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
   },
   input: {
     padding: 10,
     borderBottomWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.2)",
     marginBottom: 10,
-    borderRadius: 4
+    borderRadius: 4,
   },
   inputButton: {
     position: "absolute",
     top: -4,
-    right: 20
+    right: 20,
   },
   reminderButton: {
     marginTop: 20,
@@ -426,21 +417,21 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2
+    shadowOpacity: 0.2,
   },
   modal: {
     height: "100%",
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 20
+    marginBottom: 20,
   },
   modalButtons: {
     flexDirection: "row",
     justifyContent: "center",
-    alignItems: "center"
-  }
+    alignItems: "center",
+  },
 });

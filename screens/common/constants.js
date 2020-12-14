@@ -1,6 +1,7 @@
 export const storageKey = "workbook";
 export const markedDatesKey = "markedDates";
 export const workingHours = [
+  "07",
   "08",
   "09",
   "10",
@@ -15,5 +16,5 @@ export const workingHours = [
   "19",
   "20",
   "21",
-  "22"
+  "22",
 ];
