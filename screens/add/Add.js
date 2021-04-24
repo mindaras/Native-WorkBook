@@ -19,7 +19,7 @@ export default class Add extends Component {
       name: "",
       phone: "+3706",
       service: "Korekcija",
-      date: props.route.params.date,
+      date: new Date(props.route.params.date),
       duration: "01:00",
       hours: props.route.params.hours || "07",
       minutes: "00",

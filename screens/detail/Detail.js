@@ -27,7 +27,7 @@ export default class Detail extends Component {
       name: this.props.route.params.name,
       phone: this.props.route.params.phone,
       service: this.props.route.params.service,
-      date: this.props.route.params.date,
+      date: new Date(this.props.route.params.date),
       duration: this.props.route.params.duration,
       confirmed: this.props.route.params.confirmed,
       serviceFocused: false,

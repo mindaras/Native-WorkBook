@@ -5,8 +5,6 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 const Stack = createStackNavigator();
 
-// const AppContainer = createAppContainer(AppNavigator);
-
 export default class App extends Component {
   render() {
     return (

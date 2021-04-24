@@ -116,7 +116,7 @@ class Intro extends Component {
   onClientPress = (client) => {
     this.props.navigation.navigate("Detail", {
       ...client,
-      date: this.state.date,
+      date: this.state.date.getTime(),
     });
   };
 
@@ -139,7 +139,7 @@ class Intro extends Component {
 
   onAdd = (props) => {
     this.props.navigation.navigate("Add", {
-      date: this.state.date,
+      date: this.state.date.getTime(),
       ...props,
     });
   };
