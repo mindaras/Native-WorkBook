@@ -205,7 +205,7 @@ export default class Detail extends Component {
     const { phone, date } = this.state;
     const time = this.getTime();
 
-    Communications.text(phone, `message realted to date and time`);
+    Communications.text(phone, `message realted to ${date} and ${time}`);
   };
 
   render() {

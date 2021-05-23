@@ -188,7 +188,7 @@ class Intro extends Component {
     const lastItem = { hours: 0, minutes: 0, height: 0 };
 
     return this.state.clients.map((item, i) => {
-      const { time, name, duration, service, confirmed } = item;
+      const { time, name, phone, duration, service, confirmed } = item;
       const [hours, minutes] = time.split(":").map((t) => parseInt(t, 10));
 
       let marginTop = 0;
@@ -228,7 +228,9 @@ class Intro extends Component {
                 <Text style={styles.listItemTime}>{time}</Text>
                 <Text style={styles.textMargin}>{name}</Text>
                 <Text style={styles.textMargin}>Trukmė: {duration}</Text>
-                <Text style={styles.textMargin}>{service}</Text>
+                <Text style={styles.textMargin}>
+                  {service} {phone}
+                </Text>
               </View>
               <View>
                 <Text style={{ marginBottom: 4 }}>Patvirtinta:</Text>
@@ -308,12 +310,8 @@ class Intro extends Component {
   };
 
   render() {
-    const {
-      date,
-      markedDates,
-      showWorkCalendar,
-      showHolidayCalendar,
-    } = this.state;
+    const { date, markedDates, showWorkCalendar, showHolidayCalendar } =
+      this.state;
     const localDate = date.toLocaleDateString("lt-LT");
 
     return (
