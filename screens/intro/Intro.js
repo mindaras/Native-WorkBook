@@ -175,7 +175,7 @@ class Intro extends Component {
 
   getItemOffset = (hours, minutes) => {
     const firstWorkingHour = parseInt(workingHours[0].split(":"), 10);
-    const hourHeight = 100;
+    const hourHeight = 120;
     const borderHeight = 1;
     return (
       (hours - firstWorkingHour) * hourHeight +
@@ -206,7 +206,7 @@ class Intro extends Component {
       const [durationHours, durationMinutes] = duration
         .split(":")
         .map((d) => parseInt(d, 10));
-      const height = durationHours * 100 + (durationMinutes * 100) / 60 - 2;
+      const height = durationHours * 120 + (durationMinutes * 120) / 60 - 2;
       lastItem.hours = hours;
       lastItem.minutes = minutes;
       lastItem.height = height;
@@ -227,10 +227,9 @@ class Intro extends Component {
               <View>
                 <Text style={styles.listItemTime}>{time}</Text>
                 <Text style={styles.textMargin}>{name}</Text>
+                <Text style={styles.textMargin}>Telefonas: {phone}</Text>
                 <Text style={styles.textMargin}>Trukmė: {duration}</Text>
-                <Text style={styles.textMargin}>
-                  {service} {phone}
-                </Text>
+                <Text style={styles.textMargin}>{service}</Text>
               </View>
               <View>
                 <Text style={{ marginBottom: 4 }}>Patvirtinta:</Text>
@@ -354,7 +353,7 @@ class Intro extends Component {
           </View>
         </View>
         <ScrollView style={styles.itemContainer}>
-          <View style={{ height: workingHours.length * 100 + 40 }}>
+          <View style={{ height: workingHours.length * 120 + 40 }}>
             {this.renderWorkingHours()}
             <View style={styles.clientContainer}>{this.renderClients()}</View>
           </View>
@@ -515,7 +514,7 @@ const styles = StyleSheet.create({
   hourContainer: {
     borderWidth: 1,
     borderColor: "#333",
-    height: 100,
+    height: 120,
   },
   hourText: {
     fontWeight: "bold",
