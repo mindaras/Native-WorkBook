@@ -6,3 +6,4 @@ npm-debug.*
 *.key
 *.mobileprovision
 .reminderMessage.txt
+yarn-error.log

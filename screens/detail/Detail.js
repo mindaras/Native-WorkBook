@@ -3,13 +3,13 @@ import {
   View,
   StyleSheet,
   TextInput,
-  PickerIOS,
   Button,
   Modal,
   Text,
   TouchableHighlight,
   Image,
 } from "react-native";
+import { PickerIOS } from "@react-native-picker/picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Communications from "react-native-communications";
 import { storageKey, workingHours } from "../common";

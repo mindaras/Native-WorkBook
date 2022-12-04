@@ -1,12 +1,6 @@
 import React, { Component } from "react";
-import {
-  View,
-  StyleSheet,
-  TextInput,
-  PickerIOS,
-  Button,
-  Image,
-} from "react-native";
+import { View, StyleSheet, TextInput, Button, Image } from "react-native";
+import { PickerIOS } from "@react-native-picker/picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { storageKey, workingHours } from "../common";
 import { backgroundImage } from "../../assets";
