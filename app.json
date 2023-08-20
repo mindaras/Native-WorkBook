@@ -3,7 +3,10 @@
     "name": "WorkBook",
     "slug": "workbook",
     "privacy": "public",
-    "platforms": ["ios", "android"],
+    "platforms": [
+      "ios",
+      "android"
+    ],
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,9 +16,12 @@
       "backgroundColor": "#ffffff"
     },
     "updates": {
-      "fallbackToCacheTimeout": 0
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/2bff3700-f676-11e8-a374-7d6da91fc76f"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.mindaugaslazauskas.workbook"
@@ -24,6 +30,14 @@
       "package": "com.mindaugaslazauskas.workbook"
     },
     "description": "WorkBook application for iOS created with React Native.",
-    "githubUrl": "https://github.com/mindaras/Native-WorkBook"
+    "githubUrl": "https://github.com/mindaras/Native-WorkBook",
+    "extra": {
+      "eas": {
+        "projectId": "2bff3700-f676-11e8-a374-7d6da91fc76f"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    }
   }
 }
